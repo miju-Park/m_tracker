@@ -16,35 +16,41 @@
 				goto('/');
 				return;
 			}
-			if (user && currentPath === '/') {
-				goto('/dashboard');
-				return;
-			}
+
 			if (!user) {
 				return;
 			}
-			let dataToSetToStore: { email: string } | null = null;
-			const docRef = doc(db, 'users', user.uid);
-			const docSnap = await getDoc(docRef);
-			if (!docSnap.exists()) {
-				console.log('create user');
-				const userRef = doc(db, 'users', user.uid);
-				dataToSetToStore = {
-					email: user.email || ''
-				};
-				await setDoc(userRef, dataToSetToStore, { merge: true });
-			} else {
-				console.log('Fetching User');
-				dataToSetToStore = docSnap.data() as { email: string };
+			try {
+				let dataToSetToStore: { email: string } | null = null;
+				const docRef = doc(db, 'users', user.uid);
+				const docSnap = await getDoc(docRef);
+				if (!docSnap.exists()) {
+					console.log('create user');
+					const userRef = doc(db, 'users', user.uid);
+					dataToSetToStore = {
+						email: user.email || ''
+					};
+					await setDoc(userRef, dataToSetToStore, { merge: true });
+				} else {
+					console.log('Fetching User');
+					dataToSetToStore = docSnap.data() as { email: string };
+				}
+				authStore.update((cur) => {
+					return {
+						...cur,
+						user,
+						loading: false,
+						data: dataToSetToStore
+					};
+				});
+				if (user && currentPath === '/') {
+					goto('/dashboard');
+					return;
+				}
+			} catch (error) {
+				console.error('Error in onAuthStateChanged:', error);
+				// Handle the error appropriately
 			}
-			authStore.update((cur) => {
-				return {
-					...cur,
-					user,
-					isLoading: false,
-					data: dataToSetToStore
-				};
-			});
 		});
 		return unsubscribe;
 	});
