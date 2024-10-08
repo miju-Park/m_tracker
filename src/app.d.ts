@@ -1,13 +1,17 @@
 // See https://kit.svelte.dev/docs/types#app
+
+import type { Timestamp } from 'firebase/firestore';
+
 // for information about these interfaces
 declare global {
 	interface UserType {
 		email: string;
 	}
 	interface TransactionType {
+		id: string;
 		userId: string;
 		amount: number;
-		date: Date;
+		date: Timestamp;
 		description: string;
 	}
 	namespace App {

@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { authStore } from '../../store/store';
-	import { transactionHandlers, transactionStore } from '../../store/transaction';
+	import {
+		groupedTransations,
+		transactionHandlers,
+		transactionStore
+	} from '../../store/transaction';
 	import type { User } from 'firebase/auth';
 	import { Plus } from 'lucide-svelte';
 	import {
@@ -14,28 +18,51 @@
 	} from '@/components/ui/table';
 	import { Button } from '@/components/ui/button';
 	import { goto } from '$app/navigation';
+	import dayjs from 'dayjs';
+	import { getDayOfWeek } from '@/utils';
+	import MonthPicker from '@/components/MonthPicker.svelte';
+	import type { CitrusProps } from 'lucide-svelte/icons/citrus';
+	import InputShortcut from '@/components/InputShortcut.svelte';
 
 	let user: User | null;
-	authStore.subscribe(async (curr) => {
-		user = curr.user;
-		console.log('subscribe user');
-		if (user) {
-			const data = await transactionHandlers.getAll(user.uid);
-			const transactions = data.docs.map((doc) => doc.data());
+	let year = new Date().getFullYear();
+	let month = new Date().getMonth() + 1;
 
+	const fetchTransaction = async (userId: string, year: number, month: number) => {
+		if (userId && year && month) {
+			console.log('---fetch---', year, month);
+			const transactions = await transactionHandlers.getAll(userId, year, month);
 			transactionStore.set(transactions);
 		}
-	});
+	};
+	const handleMonthChange = (event: CustomEvent<{ month: number; year: number }>) => {
+		year = event.detail.year;
+		month = event.detail.month;
+		fetchTransaction(user?.uid ?? '', year, month);
+	};
 
 	function navigateToInput() {
 		goto('/input');
 	}
+
+	const unsubscribe = authStore.subscribe(async (curr) => {
+		user = curr.user;
+		fetchTransaction(user?.uid ?? '', year, month);
+	});
+
+	onMount(() => {
+		return () => unsubscribe();
+	});
 </script>
 
 {#if !$authStore.loading}
 	<div class="mainContainer">
 		<div class="headerContainer">
 			<h1>가계부 내역</h1>
+			<MonthPicker on:monthChange={handleMonthChange} />
+			<div class="flex justify-center">
+				<InputShortcut />
+			</div>
 			<!-- <div class="headerBtns">
 				<button on:click={saveTodos}>
 					<i class="fa-regular fa-floppy-disk" />
@@ -50,25 +77,21 @@
 		<main>
 			<div class="transaction-table">
 				<h2>Transactions</h2>
-				{#if $transactionStore.length > 0}
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Date</TableHead>
-								<TableHead>Description</TableHead>
-								<TableHead>Amount</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{#each $transactionStore as transaction}
-								<TableRow>
-									<TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
-									<TableCell>{transaction.description}</TableCell>
-									<TableCell>{transaction.amount.toFixed(2)}</TableCell>
-								</TableRow>
+				{#if Object.keys($groupedTransations).length > 0}
+					{#each Object.keys($groupedTransations) as date}
+						<h1 class="dateHeader">
+							{dayjs(date).format('MM/DD')} ({getDayOfWeek(new Date(date))})
+						</h1>
+						<ul class="transactions">
+							{#each $groupedTransations[date] as transaction}
+								<li class="transaction">
+									<div>{dayjs(transaction.date.toDate()).format('YYYY-MM-DD')}</div>
+									<div>{transaction.description}</div>
+									<div>{transaction.amount}원</div>
+								</li>
 							{/each}
-						</TableBody>
-					</Table>
+						</ul>
+					{/each}
 				{:else}
 					<p>No transactions found.</p>
 				{/if}
@@ -77,19 +100,28 @@
 				<Plus />
 			</Button>
 		</main>
-		<!-- <main>
-			{#if todoList.length === 0}
-				<p>You have nothing to do!</p>
-			{/if}
-			{#each todoList as todo, index}
-				<TodoItem {todo} {index} {removeTodo} {editTodo} />
-			{/each}
-		</main>
-		<div class={'enterTodo ' + (error ? 'errorBorder' : '')}>
-			<input bind:value={currTodo} type="text" placeholder="Enter todo" />
-			<button on:click={addTodo}>ADD</button>
-		</div> -->
 	</div>
 {:else}
 	<p>??</p>
 {/if}
+
+<style>
+	.dateHeader {
+		margin-top: 20px;
+	}
+
+	.mainContainer {
+		padding: 20px 40px;
+	}
+
+	.transactions {
+		list-style-type: none;
+		margin: 0 20px;
+	}
+	.transaction {
+		display: flex;
+		justify-content: space-between;
+		border-bottom: 1px solid #ccc;
+		padding: 10px 0;
+	}
+</style>

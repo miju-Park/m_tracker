@@ -33,10 +33,13 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"bits-ui": "^0.21.15",
+		"@internationalized/date": "^3.5.6",
+		"bits-ui": "^0.21.16",
 		"clsx": "^2.1.1",
+		"dayjs": "^1.11.13",
 		"firebase": "^10.13.2",
 		"lucide-svelte": "^0.441.0",
+		"svelte-radix": "^1.1.1",
 		"tailwind-merge": "^2.5.2",
 		"tailwind-variants": "^0.2.1"
 	}
