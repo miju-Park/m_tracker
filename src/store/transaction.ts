@@ -34,7 +34,7 @@ export const transactionHandlers = {
 				}) as TransactionType
 		);
 	},
-	add: async (transaction: TransactionType) => {
+	add: async (transaction: Omit<TransactionType, 'id'>) => {
 		const docRef = doc(collection(db, 'transactions'));
 		await setDoc(docRef, transaction);
 	}

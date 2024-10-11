@@ -13,6 +13,8 @@ declare global {
 		amount: number;
 		date: Timestamp;
 		description: string;
+		type: string;
+		category: string;
 	}
 	namespace App {
 		// interface Error {}

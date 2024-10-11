@@ -10,7 +10,7 @@
 		dateStyle: 'long'
 	});
 
-	let value: DateValue | undefined = undefined;
+	export let value: DateValue | undefined = undefined;
 </script>
 
 <Popover.Root>
@@ -18,7 +18,7 @@
 		<Button
 			variant="outline"
 			class={cn(
-				'w-[280px] justify-start text-left font-normal bg-transparent border-none',
+				'w-[280px] justify-start hover:bg-transparent text-left font-normal bg-transparent border-none hover:text-white',
 				!value && 'text-muted-foreground'
 			)}
 			builders={[builder]}

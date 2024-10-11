@@ -19,10 +19,11 @@
 	import { Button } from '@/components/ui/button';
 	import { goto } from '$app/navigation';
 	import dayjs from 'dayjs';
-	import { getDayOfWeek } from '@/utils';
+	import { getDayOfWeek, parseCategoryInfo } from '@/utils';
 	import MonthPicker from '@/components/MonthPicker.svelte';
 	import type { CitrusProps } from 'lucide-svelte/icons/citrus';
 	import InputShortcut from '@/components/InputShortcut.svelte';
+	import { Timestamp } from 'firebase/firestore';
 
 	let user: User | null;
 	let year = new Date().getFullYear();
@@ -50,6 +51,23 @@
 		fetchTransaction(user?.uid ?? '', year, month);
 	});
 
+	const insertDb = async (
+		event: CustomEvent<{
+			type: string;
+			category: string;
+			date: string;
+			description: string;
+			amount: number;
+		}>
+	) => {
+		const data = event.detail;
+		await transactionHandlers.add({
+			...data,
+			userId: user?.uid ?? '',
+			date: Timestamp.fromDate(new Date(data.date))
+		});
+	};
+
 	onMount(() => {
 		return () => unsubscribe();
 	});
@@ -61,44 +79,46 @@
 			<h1>가계부 내역</h1>
 			<MonthPicker on:monthChange={handleMonthChange} />
 			<div class="flex justify-center">
-				<InputShortcut />
+				<InputShortcut on:submit={insertDb} />
 			</div>
-			<!-- <div class="headerBtns">
-				<button on:click={saveTodos}>
-					<i class="fa-regular fa-floppy-disk" />
-					<p>Save</p></button
-				>
-				<button on:click={authHandler.logout}>
-					<i class="fa-solid fa-right-from-bracket" />
-					<p>Logout</p></button
-				>
-			</div> -->
 		</div>
-		<main>
-			<div class="transaction-table">
-				<h2>Transactions</h2>
-				{#if Object.keys($groupedTransations).length > 0}
-					{#each Object.keys($groupedTransations) as date}
-						<h1 class="dateHeader">
-							{dayjs(date).format('MM/DD')} ({getDayOfWeek(new Date(date))})
-						</h1>
-						<ul class="transactions">
-							{#each $groupedTransations[date] as transaction}
-								<li class="transaction">
-									<div>{dayjs(transaction.date.toDate()).format('YYYY-MM-DD')}</div>
-									<div>{transaction.description}</div>
-									<div>{transaction.amount}원</div>
-								</li>
-							{/each}
-						</ul>
-					{/each}
-				{:else}
-					<p>No transactions found.</p>
-				{/if}
+		<main class="w-full flex justify-center">
+			<div class="inline-flex flex-col">
+				<div class="inline-flex flex-col">
+					{#if Object.keys($groupedTransations).length > 0}
+						{#each Object.keys($groupedTransations) as date}
+							<h1 class="dateHeader">
+								{dayjs(date).format('MM/DD')} ({getDayOfWeek(new Date(date))})
+							</h1>
+							<div>
+								<ul class="transactions">
+									{#each $groupedTransations[date] as transaction}
+										{@const categoryInfo = parseCategoryInfo(transaction.category)}
+										<li class="transaction">
+											<div class="text-start">
+												<span
+													style={`background-color: ${categoryInfo.color}`}
+													class="rounded-lg px-3 py-1 text-black"
+												>
+													{categoryInfo.icon}
+													{categoryInfo.category}
+												</span>
+											</div>
+											<div>{transaction.description}</div>
+											<div>{transaction.amount}원</div>
+										</li>
+									{/each}
+								</ul>
+							</div>
+						{/each}
+					{:else}
+						<p>No transactions found.</p>
+					{/if}
+				</div>
+				<Button size="icon" class="fixed right-8 bottom-8 rounded-full" on:click={navigateToInput}>
+					<Plus />
+				</Button>
 			</div>
-			<Button size="icon" class="fixed right-8 bottom-8 rounded-full" on:click={navigateToInput}>
-				<Plus />
-			</Button>
 		</main>
 	</div>
 {:else}
@@ -111,15 +131,24 @@
 	}
 
 	.mainContainer {
-		padding: 20px 40px;
+		padding: 1rem 5rem;
+		width: 100%;
+	}
+	.headerContainer {
+		width: 100%;
 	}
 
 	.transactions {
 		list-style-type: none;
-		margin: 0 20px;
+		padding: 0;
+		display: inline-flex;
+		margin: 0 auto;
+		flex-direction: column;
 	}
 	.transaction {
-		display: flex;
+		display: grid;
+		grid-template-columns: 1fr 2fr 150px;
+		grid-auto-flow: row;
 		justify-content: space-between;
 		border-bottom: 1px solid #ccc;
 		padding: 10px 0;

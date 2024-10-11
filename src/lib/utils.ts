@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
 import dayjs from 'dayjs';
+import { expenseCategories, incomeCategories } from './const';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -60,4 +61,26 @@ export const getDayOfWeek = (date: Date) => {
 	const days = ['일', '월', '화', '수', '목', '금', '토'];
 	const dayIndex = dayjs(date).day();
 	return days[dayIndex];
+};
+
+export const parseCategoryInfo = (inputStr: string) => {
+	const bracketPattern = /^\[([^\]]+)\]/;
+	const plainPattern = /^([^[\s]+(?:\s+[^[\s]+)*)/;
+	let category = '';
+	let match = inputStr.match(bracketPattern);
+	if (match) {
+		category = match[1];
+	}
+
+	match = inputStr.match(plainPattern);
+	if (match) {
+		category = match[1];
+	}
+	return {
+		category,
+		icon:
+			[...incomeCategories, ...expenseCategories].find((v) => v.category === category)?.icon ?? '',
+		color:
+			[...incomeCategories, ...expenseCategories].find((v) => v.category === category)?.color ?? ''
+	};
 };
