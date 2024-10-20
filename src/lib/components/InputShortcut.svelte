@@ -55,18 +55,18 @@
 		dispatch('submit', { type: type.value, category, date: date.toString(), description, amount });
 
 		// Reset the form
-		type = { value: 'income', label: '수입' };
+		// type = { value: 'income', label: '수입' };
 		inputCategory = {
 			label: '',
 			color: ''
 		};
 		amount = null;
 		description = '';
-		date = new CalendarDate(today.year(), today.month() + 1, today.date());
+		// date = new CalendarDate(today.year(), today.month() + 1, today.date());
 	}
 </script>
 
-<div class="input-container bg-gradient-to-r from-[#000428] to-[#000046] px-12">
+<div class="input-container bg-gradient-to-r from-[#000428] to-[#000046] px-12 items-center">
 	<Select bind:selected={type}>
 		<SelectTrigger class="w-28">
 			<SelectValue />
@@ -79,7 +79,7 @@
 
 	<div class="flex flex-col">
 		<Label class="text-[#1abc9c] font-bold px-4">날짜</Label>
-		<Datepicker bind:value={date} />
+		<Datepicker bind:value={date} class="w-[150px]" />
 	</div>
 	<div class="flex flex-col">
 		<Label class="text-[#1abc9c] font-bold px-4">카테고리</Label>
@@ -156,9 +156,9 @@
 			}}
 		>
 			<PopoverTrigger>
-				<Input bind:value={amount} class="border-none" />
+				<Input bind:value={amount} class="border-none border-b-2 border-white" />
 			</PopoverTrigger>
-			<PopoverContent align="end" class="w-[350px]">
+			<PopoverContent align="end" class="w-[350px] p-0 bg-transparent border-none">
 				<Calculator on:submit={handleAmountSubmit} />
 			</PopoverContent>
 		</Popover>

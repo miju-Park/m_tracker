@@ -5,12 +5,19 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
+	import type { HTMLAttributes } from 'react';
 
 	const df = new DateFormatter('en-US', {
 		dateStyle: 'long'
 	});
 
+	type $$Props = HTMLAttributes<HTMLButtonElement> & {
+		value?: DateValue | undefined;
+	};
+
 	export let value: DateValue | undefined = undefined;
+	let className: $$Props['className'] = undefined;
+	export { className as class };
 </script>
 
 <Popover.Root>
@@ -19,6 +26,7 @@
 			variant="outline"
 			class={cn(
 				'w-[280px] justify-start hover:bg-transparent text-left font-normal bg-transparent border-none hover:text-white',
+				className,
 				!value && 'text-muted-foreground'
 			)}
 			builders={[builder]}

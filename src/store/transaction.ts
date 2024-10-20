@@ -2,6 +2,7 @@ import { db } from '$lib/firebase/firebase';
 import dayjs from 'dayjs';
 import {
 	collection,
+	deleteDoc,
 	doc,
 	getDocs,
 	orderBy,
@@ -37,6 +38,10 @@ export const transactionHandlers = {
 	add: async (transaction: Omit<TransactionType, 'id'>) => {
 		const docRef = doc(collection(db, 'transactions'));
 		await setDoc(docRef, transaction);
+	},
+	remove: async (transactionId: string) => {
+		const docRef = doc(db, 'transactions', transactionId);
+		await deleteDoc(docRef);
 	}
 };
 export const groupedTransations = derived(transactionStore, ($transactionStore) => {
