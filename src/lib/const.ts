@@ -39,8 +39,11 @@ export const expenseCategories = [
 ];
 
 export const withdrawCategories = [
-	{ category: '현금인출', icon: '💰', color: '#424242' },
-	{ category: '계좌이체', icon: '🏦', color: '#616161' },
-	{ category: '투자', icon: '📊', color: '#757575' },
-	{ category: '기타출금', icon: '🔄', color: '#9E9E9E' }
+	{ category: '적금', subCategory: '기업적금(자동차보험용)' },
+	{ category: '적금', subCategory: '신한 알쏠' },
+	{ category: '적금', subCategory: '신한 언제든적금' },
+	{ category: '적금', subCategory: '신한 청년적금' },
+	{ category: 'ISA', subCategory: '-' },
+	{ category: '퇴직연금', subCategory: '신한 퇴직연금' },
+	{ category: '개인연금', subCategory: '한투 개인연금' }
 ];

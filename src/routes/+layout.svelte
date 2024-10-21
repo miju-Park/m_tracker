@@ -25,7 +25,6 @@
 				const docRef = doc(db, 'users', user.uid);
 				const docSnap = await getDoc(docRef);
 				if (!docSnap.exists()) {
-					console.log('create user');
 					const userRef = doc(db, 'users', user.uid);
 					dataToSetToStore = {
 						email: user.email || ''

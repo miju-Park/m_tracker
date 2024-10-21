@@ -35,8 +35,10 @@
 		CommandList
 	} from '@/components/ui/command';
 	import { CommandInput } from 'cmdk-sv';
-	import { expenseCategories, incomeCategories } from '@/const';
 	import { Textarea } from '@/components/ui/textarea';
+	import { Timestamp } from 'firebase/firestore';
+	import { expenseCategories, incomeCategories } from '../../store/configStore';
+	import { get } from 'svelte/store';
 
 	let description = '';
 	let today = dayjs();
@@ -155,14 +157,14 @@
 							<CommandEmpty>No results found.</CommandEmpty>
 							<CommandGroup>
 								{#if type.value === 'income'}
-									{#each incomeCategories as category}
+									{#each get(incomeCategories) as category}
 										<CommandItem
 											value={category.category}
 											class="grid grid-cols-[1fr,auto] gap-1 items-center"
 											onSelect={(val) => {
 												inputCategory = {
 													label: `${category.icon} ${val}`,
-													color: category.color
+													color: category?.color ?? ''
 												};
 												popover.categoryOpen = false;
 											}}
@@ -172,14 +174,14 @@
 										</CommandItem>
 									{/each}
 								{:else}
-									{#each expenseCategories as category}
+									{#each get(expenseCategories) as category}
 										<CommandItem
 											value={`[${category.category}] ${category.subCategory}`}
 											class="grid grid-cols-[1fr,auto] gap-1 items-center"
 											onSelect={(val) => {
 												inputCategory = {
 													label: `${category.icon} ${val}`,
-													color: category.color
+													color: category?.color ?? ''
 												};
 												popover.categoryOpen = false;
 											}}

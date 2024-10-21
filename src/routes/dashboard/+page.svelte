@@ -8,26 +8,23 @@
 	} from '../../store/transaction';
 	import type { User } from 'firebase/auth';
 	import { Plus } from 'lucide-svelte';
-	import {
-		Table,
-		TableBody,
-		TableCell,
-		TableHead,
-		TableHeader,
-		TableRow
-	} from '@/components/ui/table';
 	import { Button } from '@/components/ui/button';
 	import { goto } from '$app/navigation';
 	import dayjs from 'dayjs';
 	import { getDayOfWeek, parseCategoryInfo } from '@/utils';
 	import MonthPicker from '@/components/MonthPicker.svelte';
-	import type { CitrusProps } from 'lucide-svelte/icons/citrus';
 	import InputShortcut from '@/components/InputShortcut.svelte';
 	import { Timestamp } from 'firebase/firestore';
+	import { configHandler, configStore } from '../../store/configStore';
 
 	let user: User | null;
 	let year = new Date().getFullYear();
 	let month = new Date().getMonth() + 1;
+
+	const fetchConfig = async (userId: string) => {
+		const configInfo = await configHandler.get(userId);
+		configStore.set(configInfo);
+	};
 
 	const fetchTransaction = async (userId: string, year: number, month: number) => {
 		if (userId && year && month) {
@@ -56,6 +53,7 @@
 
 	const unsubscribe = authStore.subscribe(async (curr) => {
 		user = curr.user;
+		fetchConfig(user?.uid ?? '');
 		fetchTransaction(user?.uid ?? '', year, month);
 	});
 

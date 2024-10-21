@@ -15,6 +15,18 @@ declare global {
 		description: string;
 		type: string;
 		category: string;
+		subCategory?: string;
+		memo?: string;
+	}
+	interface Config {
+		id: string;
+		userId: string;
+		type: 'income' | 'expense' | 'withdraw';
+		category: string;
+		subCategory?: string;
+		budget: number;
+		icon?: string;
+		color?: string;
 	}
 	namespace App {
 		// interface Error {}
