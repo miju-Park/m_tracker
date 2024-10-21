@@ -28,7 +28,6 @@
 
 	const fetchTransaction = async (userId: string, year: number, month: number) => {
 		if (userId && year && month) {
-			console.log('---fetch---', year, month);
 			const transactions = await transactionHandlers.getAll(userId, year, month);
 			transactionStore.set(transactions);
 		}
@@ -36,6 +35,7 @@
 	const handleMonthChange = (event: CustomEvent<{ month: number; year: number }>) => {
 		year = event.detail.year;
 		month = event.detail.month;
+		transactionStore.set([]);
 		fetchTransaction(user?.uid ?? '', year, month);
 	};
 
@@ -52,9 +52,16 @@
 	}
 
 	const unsubscribe = authStore.subscribe(async (curr) => {
-		user = curr.user;
-		fetchConfig(user?.uid ?? '');
-		fetchTransaction(user?.uid ?? '', year, month);
+		try {
+			user = curr.user;
+			if (user) {
+				fetchConfig(user?.uid ?? '');
+				fetchTransaction(user?.uid ?? '', year, month);
+			}
+		} catch (error) {
+			console.log('Error authStore subscribe');
+			console.error(error);
+		}
 	});
 
 	const insertDb = async (
@@ -106,9 +113,9 @@
 											<tr class="transaction">
 												<td class="category" style={`background-color: ${categoryInfo.color}`}>
 													{categoryInfo.icon}
-													{categoryInfo.category}
+													{transaction.category}
 												</td>
-												<td>{transaction.description}</td>
+												<td>{transaction.description || ''}</td>
 												<td>{Number(transaction.amount)?.toLocaleString()}원</td>
 
 												<button

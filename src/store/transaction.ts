@@ -9,6 +9,7 @@ import {
 	query,
 	QueryDocumentSnapshot,
 	setDoc,
+	Timestamp,
 	where,
 	type DocumentData
 } from 'firebase/firestore';
@@ -19,9 +20,16 @@ export const transactionStore = writable<TransactionType[]>([]);
 export const transactionHandlers = {
 	getAll: async (userId: string, year: number, month: number) => {
 		const transactionsRef = collection(db, 'transactions');
+		const startDate = Timestamp.fromDate(
+			new Date(month === 1 ? `${year - 1}-12-25` : `${year}-${month - 1}-25`)
+		);
+		const endDate = Timestamp.fromDate(new Date(`${year}-${month}-24`));
+
 		const q = query(
 			transactionsRef,
-			// where('userId', '==', userId),
+			where('userId', '==', userId),
+			where('date', '>=', startDate),
+			where('date', '<=', endDate),
 			orderBy('date', 'desc')
 		);
 

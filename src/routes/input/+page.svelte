@@ -69,7 +69,7 @@
 				description,
 				date: Timestamp.fromDate(new Date(date.toString())),
 				amount: Number(amount),
-				type,
+				type: type.value,
 				category,
 				memo,
 				userId
@@ -104,24 +104,10 @@
 	<h1>가계부 입력</h1>
 
 	<form on:submit|preventDefault={handleSubmit}>
-		<div class="flex w-full max-w-sm flex-col gap-1.5">
-			<Label class="text-[#1abc9c] font-bold px-4">타입</Label>
-			<Select bind:selected={type}>
-				<SelectTrigger>
-					<SelectValue />
-				</SelectTrigger>
-				<SelectContent>
-					<SelectItem value="income">수입</SelectItem>
-					<SelectItem value="expense">지출</SelectItem>
-				</SelectContent>
-			</Select>
-		</div>
-
 		<div class="flex w-full justify-start max-w-sm flex-col gap-1.5">
 			<Label class="text-[#1abc9c] font-bold px-4">날짜</Label>
 			<Datepicker bind:value={date} />
 		</div>
-
 		<div class="flex flex-col w-full">
 			<Label class="text-[#1abc9c] font-bold">금액</Label>
 			<Popover
@@ -138,6 +124,19 @@
 				</PopoverContent>
 			</Popover>
 		</div>
+		<div class="flex w-full max-w-sm flex-col gap-1.5">
+			<Label class="text-[#1abc9c] font-bold px-4">타입</Label>
+			<Select bind:selected={type}>
+				<SelectTrigger>
+					<SelectValue />
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem value="income">수입</SelectItem>
+					<SelectItem value="expense">지출</SelectItem>
+				</SelectContent>
+			</Select>
+		</div>
+
 		<div class="flex flex-col justify-start w-full">
 			<Label class="text-[#1abc9c] font-bold px-4">카테고리</Label>
 			<Popover open={popover.categoryOpen} onOpenChange={(val) => (popover.categoryOpen = val)}>
@@ -150,7 +149,7 @@
 						{/if}
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent class="p-0 w-auto" align="start">
+				<PopoverContent class="p-0 w-[--radix-popover-trigger-width]" align="start">
 					<Command>
 						<CommandInput placeholder="Select category" />
 						<CommandList>

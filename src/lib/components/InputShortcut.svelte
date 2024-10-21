@@ -20,8 +20,8 @@
 	import { Select, SelectContent, SelectItem, SelectValue } from './ui/select';
 	import SelectTrigger from './ui/select/select-trigger.svelte';
 	import type { Selected } from 'bits-ui';
-	import Calendar from './ui/calendar/calendar.svelte';
-	import { expenseCategories, incomeCategories } from '@/const';
+	import { get } from 'svelte/store';
+	import { expenseCategories, incomeCategories, withdrawCategories } from '../../store/configStore';
 
 	const dispatch = createEventDispatcher();
 
@@ -74,6 +74,7 @@
 		<SelectContent>
 			<SelectItem value="income">수입</SelectItem>
 			<SelectItem value="expense">지출</SelectItem>
+			<SelectItem value="withdraw">이체</SelectItem>
 		</SelectContent>
 	</Select>
 
@@ -100,7 +101,7 @@
 						<CommandEmpty>No results found.</CommandEmpty>
 						<CommandGroup>
 							{#if type.value === 'income'}
-								{#each incomeCategories as category}
+								{#each get(incomeCategories) as category}
 									<CommandItem
 										value={category.category}
 										class="grid grid-cols-[1fr,auto] gap-1 items-center"
@@ -116,15 +117,32 @@
 										{category.category}
 									</CommandItem>
 								{/each}
+							{:else if type.value === 'withdraw'}
+								{#each get(withdrawCategories) as category}
+									<CommandItem
+										value={`[${category.category}] ${category.subCategory}`}
+										class="grid grid-cols-[1fr,auto] gap-1 items-center"
+										onSelect={(val) => {
+											inputCategory = {
+												label: `${val}`,
+												color: category?.color ?? ''
+											};
+											popover.categoryOpen = false;
+										}}
+									>
+										[{category.category}]
+										{category.subCategory}
+									</CommandItem>
+								{/each}
 							{:else}
-								{#each expenseCategories as category}
+								{#each get(expenseCategories) as category}
 									<CommandItem
 										value={`[${category.category}] ${category.subCategory}`}
 										class="grid grid-cols-[1fr,auto] gap-1 items-center"
 										onSelect={(val) => {
 											inputCategory = {
 												label: `${category.icon} ${val}`,
-												color: category.color
+												color: category?.color ?? ''
 											};
 											popover.categoryOpen = false;
 										}}
