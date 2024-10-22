@@ -5,8 +5,9 @@
 	const dispatch = createEventDispatcher();
 
 	let date = new Date();
-	let month = date.getMonth() + 1; // JavaScript months are zero-based
-	let year = date.getFullYear();
+	export let month = date.getMonth() + 1; // JavaScript months are zero-based
+	export let year = date.getFullYear();
+	export const disabledMove = false;
 
 	function updateMonth(change: number) {
 		month += change;
@@ -22,12 +23,16 @@
 </script>
 
 <div class="month-picker">
-	<button class="nav" on:click={() => updateMonth(-1)}><ChevronLeft /></button>
+	{#if !disabledMove}
+		<button class="nav" on:click={() => updateMonth(-1)}><ChevronLeft /></button>
+	{/if}
 	<div>
 		<div class="year">{year}</div>
 		<div class="month">{month}월</div>
 	</div>
-	<button class="nav" on:click={() => updateMonth(1)}><ChevronRight /></button>
+	{#if !disabledMove}
+		<button class="nav" on:click={() => updateMonth(1)}><ChevronRight /></button>
+	{/if}
 </div>
 
 <style>

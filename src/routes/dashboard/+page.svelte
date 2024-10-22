@@ -2,13 +2,12 @@
 	import { onMount } from 'svelte';
 	import { authStore } from '../../store/store';
 	import {
-		summariedTransactions,
 		groupedTransations,
 		transactionHandlers,
 		transactionStore
 	} from '../../store/transaction';
 	import type { User } from 'firebase/auth';
-	import { Plus } from 'lucide-svelte';
+	import { Plus, ScanSearch } from 'lucide-svelte';
 	import { Button } from '@/components/ui/button';
 	import { goto } from '$app/navigation';
 	import dayjs from 'dayjs';
@@ -17,25 +16,32 @@
 	import InputShortcut from '@/components/InputShortcut.svelte';
 	import { Timestamp } from 'firebase/firestore';
 	import { configHandler, configStore } from '../../store/configStore';
+	import { Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte';
+	import Summary from '@/components/Summary.svelte';
+	import { dateStore } from '../../store/date';
 
 	let user: User | null;
-	let year = new Date().getFullYear();
-	let month = new Date().getMonth() + 1;
+	let year: number | null;
+	let month: number | null;
 
 	const fetchConfig = async (userId: string) => {
 		const configInfo = await configHandler.get(userId);
 		configStore.set(configInfo);
 	};
 
-	const fetchTransaction = async (userId: string, year: number, month: number) => {
+	const fetchTransaction = async (userId: string, year: number | null, month: number | null) => {
 		if (userId && year && month) {
 			const transactions = await transactionHandlers.getAll(userId, year, month);
 			transactionStore.addUnique(transactions);
 		}
 	};
 	const handleMonthChange = (event: CustomEvent<{ month: number; year: number }>) => {
-		year = event.detail.year;
-		month = event.detail.month;
+		const year = event.detail.year;
+		const month = event.detail.month;
+		dateStore.set({
+			year,
+			month
+		});
 		fetchTransaction(user?.uid ?? '', year, month);
 	};
 
@@ -50,6 +56,10 @@
 	function navigateToInput() {
 		goto('/input');
 	}
+
+	const unsubscribeDate = dateStore.subscribe((cur) => {
+		(year = cur.year), (month = cur.month);
+	});
 
 	const unsubscribe = authStore.subscribe(async (curr) => {
 		try {
@@ -95,64 +105,60 @@
 			<div class="flex gap-2 bg-[#1abc9c] items-center justify-center">
 				<MonthPicker on:monthChange={handleMonthChange} />
 				<div class="w-[1px] h-full bg-white" />
-				<div class="flex text-lg flex-col">
-					<p>
-						<span class="font-bold opacity-70 mr-2">총 수입</span>
-						{$summariedTransactions.income.toLocaleString()} 원
-					</p>
-					<p>
-						<span class="font-bold opacity-70 mr-2">지출</span>
-						{$summariedTransactions.expense.toLocaleString()} 원
-					</p>
-				</div>
+				<Summary />
 			</div>
 			<div class="flex justify-center hide-on-mobile">
 				<InputShortcut on:submit={insertDb} />
 			</div>
 		</div>
 		<main class="w-full listContainer">
-			<div class="flex flex-col">
-				<div class="flex flex-col">
-					{#if Object.keys($groupedTransations).length > 0}
-						{#each Object.keys($groupedTransations) as date}
-							<h1 class="dateHeader">
-								{dayjs(date).format('MM/DD')} ({getDayOfWeek(new Date(date))})
-							</h1>
-							<div>
-								<table class="transactions-table">
-									<tbody>
-										{#each $groupedTransations[date] as transaction}
-											{@const categoryInfo = parseCategoryInfo(transaction.category)}
-											<tr class="transaction">
-												<td class="category" style={`background-color: ${categoryInfo.color}`}>
-													{categoryInfo.icon}
-													{transaction.category}
-												</td>
-												<td>{transaction.description || ''}</td>
-												<td>{Number(transaction.amount)?.toLocaleString()}원</td>
+			{#if Object.keys($groupedTransations).length > 0}
+				<Table class="bg-transparent" noborder>
+					{#each Object.keys($groupedTransations) as date}
+						<h1 class="dateHeader">
+							{dayjs(date).format('MM/DD')} ({getDayOfWeek(new Date(date))})
+						</h1>
+						<!-- <table class="transactions-table"> -->
+						<TableBody tableBodyClass="bg-transparent">
+							{#each $groupedTransations[date] as transaction}
+								{@const categoryInfo = parseCategoryInfo(transaction.category)}
+								<TableBodyRow class="bg-transparent py-7">
+									<TableBodyCell
+										><span
+											class="p-2 rounded-3xl whitespace-nowrap mr-2 my-auto"
+											style={`background-color: ${categoryInfo.color}`}
+										>
+											{categoryInfo.icon}
+											{transaction.category}
+										</span>
+									</TableBodyCell>
+									<TableBodyCell class="text-white">{transaction.description || ''}</TableBodyCell>
+									<TableBodyCell class="text-white"
+										>{Number(transaction.amount)?.toLocaleString()}원</TableBodyCell
+									>
 
-												<button
-													class="delete-button"
-													on:click={() => deleteTransaction(transaction.id)}>삭제</button
-												>
-											</tr>
-										{/each}
-									</tbody>
-								</table>
-							</div>
-						{/each}
-					{:else}
-						<p>No transactions found.</p>
-					{/if}
+									<button class="delete-button" on:click={() => deleteTransaction(transaction.id)}
+										>삭제</button
+									>
+								</TableBodyRow>
+							{/each}
+						</TableBody>
+					{/each}
+				</Table>
+			{:else}
+				<div class="flex flex-col justify-center items-center w-full h-full text-lg gap-4">
+					<ScanSearch color="white" size={24} />
+					No Results
 				</div>
-				<Button
-					size="icon"
-					class="fixed right-8 bottom-8 rounded-full bg-[#1abc9c] hover:bg-[#12836d]"
-					on:click={navigateToInput}
-				>
-					<Plus />
-				</Button>
-			</div>
+			{/if}
+
+			<Button
+				size="icon"
+				class="fixed right-8 bottom-8 rounded-full bg-[#1abc9c] hover:bg-[#12836d]"
+				on:click={navigateToInput}
+			>
+				<Plus />
+			</Button>
 		</main>
 	</div>
 {:else}
@@ -161,6 +167,9 @@
 
 <style>
 	.mainContainer {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
 		position: relative;
 		overflow: auto;
 		scrollbar-gutter: stable; /* Reserves space for the scrollbar */
@@ -204,6 +213,7 @@
 
 	.listContainer {
 		padding: 0rem 12rem;
+		flex: 1;
 	}
 	@media (max-width: 768px) {
 		.listContainer {
