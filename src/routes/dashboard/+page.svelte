@@ -24,11 +24,6 @@
 	let year: number | null;
 	let month: number | null;
 
-	const fetchConfig = async (userId: string) => {
-		const configInfo = await configHandler.get(userId);
-		configStore.set(configInfo);
-	};
-
 	const fetchTransaction = async (userId: string, year: number | null, month: number | null) => {
 		if (userId && year && month) {
 			const transactions = await transactionHandlers.getAll(userId, year, month);
@@ -65,7 +60,6 @@
 		try {
 			user = curr.user;
 			if (user) {
-				fetchConfig(user?.uid ?? '');
 				fetchTransaction(user?.uid ?? '', year, month);
 			}
 		} catch (error) {

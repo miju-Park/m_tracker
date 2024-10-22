@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import { authStore } from '../store/store';
 	import type { User } from 'firebase/auth';
+	import { configHandler, configStore } from '../store/configStore';
 
 	const nonAuthPaths = ['/'];
 
@@ -42,6 +43,8 @@
 						data: dataToSetToStore
 					};
 				});
+				const config = await configHandler.get(user.uid);
+				configStore.set(config);
 				if (user && currentPath === '/') {
 					goto('/dashboard');
 					return;
