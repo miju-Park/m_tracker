@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { authStore } from '../../store/store';
 	import {
+		summariedTransactions,
 		groupedTransations,
 		transactionHandlers,
 		transactionStore
@@ -29,13 +30,12 @@
 	const fetchTransaction = async (userId: string, year: number, month: number) => {
 		if (userId && year && month) {
 			const transactions = await transactionHandlers.getAll(userId, year, month);
-			transactionStore.set(transactions);
+			transactionStore.addUnique(transactions);
 		}
 	};
 	const handleMonthChange = (event: CustomEvent<{ month: number; year: number }>) => {
 		year = event.detail.year;
 		month = event.detail.month;
-		transactionStore.set([]);
 		fetchTransaction(user?.uid ?? '', year, month);
 	};
 
@@ -92,7 +92,20 @@
 {#if !$authStore.loading}
 	<div class="mainContainer">
 		<div class="headerContainer">
-			<MonthPicker on:monthChange={handleMonthChange} />
+			<div class="flex gap-2 bg-[#1abc9c] items-center justify-center">
+				<MonthPicker on:monthChange={handleMonthChange} />
+				<div class="w-[1px] h-full bg-white" />
+				<div class="flex text-lg flex-col">
+					<p>
+						<span class="font-bold opacity-70 mr-2">총 수입</span>
+						{$summariedTransactions.income.toLocaleString()} 원
+					</p>
+					<p>
+						<span class="font-bold opacity-70 mr-2">지출</span>
+						{$summariedTransactions.expense.toLocaleString()} 원
+					</p>
+				</div>
+			</div>
 			<div class="flex justify-center hide-on-mobile">
 				<InputShortcut on:submit={insertDb} />
 			</div>
