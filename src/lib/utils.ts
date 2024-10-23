@@ -3,7 +3,8 @@ import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
 import dayjs from 'dayjs';
-import { expenseCategories, incomeCategories } from './const';
+import { configStore } from '../store/configStore';
+import { get } from 'svelte/store';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -78,9 +79,7 @@ export const parseCategoryInfo = (inputStr: string) => {
 	}
 	return {
 		category,
-		icon:
-			[...incomeCategories, ...expenseCategories].find((v) => v.category === category)?.icon ?? '',
-		color:
-			[...incomeCategories, ...expenseCategories].find((v) => v.category === category)?.color ?? ''
+		icon: get(configStore).find((v) => v.category === category)?.icon ?? '',
+		color: get(configStore).find((v) => v.category === category)?.color ?? ''
 	};
 };

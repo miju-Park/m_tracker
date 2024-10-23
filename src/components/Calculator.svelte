@@ -33,12 +33,14 @@
 	const handleKeyDown = (e: KeyboardEvent) => {
 		const allowedKeys = '0123456789+-*/()';
 		const keyCode = e.key;
+
 		if (allowedKeys.includes(keyCode)) {
 			updateExpression(keyCode);
 		} else if (keyCode === 'Backspace') {
 			removeLastExpression();
 		} else if (keyCode === 'Enter') {
 			calculateResult();
+			dispatch('submit', { amount: Number($result) }); // Submit on Enter
 		}
 	};
 </script>
@@ -79,30 +81,43 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		width: 300px;
-		margin: 50px auto;
+		width: 280px;
+		margin: 20px auto;
+		background-color: #1a1a2e; /* Dark background */
+		border-radius: 8px;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
+
 	.display {
 		width: 100%;
-		background-color: #333;
-		color: white;
-		font-size: 2em;
+		background-color: #162447; /* Slightly lighter dark */
+		color: #e0e0e0; /* Light text color */
+		font-size: 1.5em;
 		text-align: right;
 		padding: 10px;
-		margin-bottom: 10px;
 	}
+
 	.buttons {
 		display: grid;
-		grid-template-columns: repeat(4, 75px);
+		grid-template-columns: repeat(4, 1fr);
 		gap: 5px;
 	}
+
 	button {
-		padding: 10px;
-		font-size: 18px;
+		padding: 12px;
+		font-size: 16px;
 		border: none;
 		cursor: pointer;
 		border-radius: 5px;
-		font-family: Arial, sans-serif;
-		text-align: center;
+		background-color: #1f4068; /* Teal accent */
+		color: #e0e0e0; /* Light text color */
+	}
+
+	button:hover {
+		background-color: #162447; /* Darker on hover */
+	}
+
+	button:active {
+		background-color: #1b1b2f; /* Even darker when pressed */
 	}
 </style>

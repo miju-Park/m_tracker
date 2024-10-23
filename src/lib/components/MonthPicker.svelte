@@ -5,8 +5,9 @@
 	const dispatch = createEventDispatcher();
 
 	let date = new Date();
-	let month = date.getMonth() + 1; // JavaScript months are zero-based
-	let year = date.getFullYear();
+	export let month = date.getMonth() + 1; // JavaScript months are zero-based
+	export let year = date.getFullYear();
+	export const disabledMove = false;
 
 	function updateMonth(change: number) {
 		month += change;
@@ -22,12 +23,16 @@
 </script>
 
 <div class="month-picker">
-	<button class="nav" on:click={() => updateMonth(-1)}><ChevronLeft /></button>
+	{#if !disabledMove}
+		<button class="nav" on:click={() => updateMonth(-1)}><ChevronLeft /></button>
+	{/if}
 	<div>
-		<div class="month">{month}월</div>
 		<div class="year">{year}</div>
+		<div class="month">{month}월</div>
 	</div>
-	<button class="nav" on:click={() => updateMonth(1)}><ChevronRight /></button>
+	{#if !disabledMove}
+		<button class="nav" on:click={() => updateMonth(1)}><ChevronRight /></button>
+	{/if}
 </div>
 
 <style>
@@ -44,18 +49,47 @@
 	.month-picker > div {
 		text-align: center;
 	}
+	@media (max-width: 600px) {
+		.month-picker {
+			padding: 10px; /* 모바일 환경에서의 조정된 패딩 */
+		}
+	}
 
 	.nav {
 		cursor: pointer;
-		font-size: 24px;
+		font-size: 18px;
 		margin: 0 20px;
 	}
 	.month {
-		font-size: 48px;
+		font-size: 24px;
 		margin: 0;
 	}
 	.year {
-		font-size: 24px;
+		font-size: 14px;
 		margin: 0;
+	}
+
+	@media (min-width: 600px) {
+		.nav {
+			font-size: 22px;
+		}
+		.month {
+			font-size: 36px;
+		}
+		.year {
+			font-size: 20px;
+		}
+	}
+
+	@media (min-width: 900px) {
+		.nav {
+			font-size: 24px;
+		}
+		.month {
+			font-size: 48px;
+		}
+		.year {
+			font-size: 24px;
+		}
 	}
 </style>

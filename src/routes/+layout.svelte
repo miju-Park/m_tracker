@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import { authStore } from '../store/store';
 	import type { User } from 'firebase/auth';
+	import { configHandler, configStore } from '../store/configStore';
 
 	const nonAuthPaths = ['/'];
 
@@ -25,7 +26,6 @@
 				const docRef = doc(db, 'users', user.uid);
 				const docSnap = await getDoc(docRef);
 				if (!docSnap.exists()) {
-					console.log('create user');
 					const userRef = doc(db, 'users', user.uid);
 					dataToSetToStore = {
 						email: user.email || ''
@@ -43,6 +43,8 @@
 						data: dataToSetToStore
 					};
 				});
+				const config = await configHandler.get(user.uid);
+				configStore.set(config);
 				if (user && currentPath === '/') {
 					goto('/dashboard');
 					return;
