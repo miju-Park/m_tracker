@@ -91,12 +91,14 @@
 	}
 </script>
 
-<div in:fly={{ y: 200, duration: 500 }}>
-	<h1>가계부 입력</h1>
-
-	<form on:submit|preventDefault={handleSubmit}>
+<form
+	on:submit|preventDefault={handleSubmit}
+	class="flex flex-col justify-between h-screen"
+	in:fly={{ y: 200, duration: 500 }}
+>
+	<div class="flex flex-col gap-4">
 		<div class="flex w-full max-w-sm flex-col gap-1.5">
-			<Label class="text-[#1abc9c] font-bold px-4">타입</Label>
+			<Label class="text-[#1abc9c] font-bold">타입</Label>
 			<Select bind:selected={type}>
 				<SelectTrigger>
 					<SelectValue />
@@ -124,14 +126,14 @@
 			</Popover>
 		</div>
 		<div class="flex w-full justify-start max-w-sm flex-col gap-1.5">
-			<Label class="text-[#1abc9c] font-bold px-4">날짜</Label>
+			<Label class="text-[#1abc9c] font-bold">날짜</Label>
 			<Datepicker bind:value={date} />
 		</div>
 		<div class="flex flex-col justify-start w-full">
-			<Label class="text-[#1abc9c] font-bold px-4">카테고리</Label>
+			<Label class="text-[#1abc9c] font-bold">카테고리</Label>
 			<Popover open={popover.categoryOpen} onOpenChange={(val) => (popover.categoryOpen = val)}>
 				<PopoverTrigger class="w-full">
-					<Button class={`w-full rounded-md bg-[${inputCategory.color}]`}>
+					<Button class={`w-full text-start rounded-md bg-[${inputCategory.color}]`}>
 						{#if inputCategory.label}
 							{inputCategory.label}
 						{:else}
@@ -188,18 +190,18 @@
 			</Popover>
 		</div>
 		<div>
-			<Label class="text-[#1abc9c] font-bold px-4">내용</Label>
+			<Label class="text-[#1abc9c] font-bold">내용</Label>
 			<Input bind:value={description} class="border-none" />
 		</div>
 
 		<div class="flex flex-col w-full gap-1.5">
-			<Label class="text-[#1abc9c] font-bold px-4">메모</Label>
+			<Label class="text-[#1abc9c] font-bold">메모</Label>
 			<Textarea id="memo" bind:value={memo}></Textarea>
 		</div>
+	</div>
 
-		<Button type="submit" class="w-full bg-[#1abc9c]">저장</Button>
-	</form>
-</div>
+	<Button type="submit" class="w-full bg-[#1abc9c]">저장</Button>
+</form>
 
 <style>
 	form {
