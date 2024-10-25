@@ -64,7 +64,7 @@ export const getDayOfWeek = (date: Date) => {
 	return days[dayIndex];
 };
 
-export const parseCategoryInfo = (inputStr: string) => {
+export const parseCategoryInfo = (configLists: Config[], inputStr: string) => {
 	const bracketPattern = /^\[([^\]]+)\]/;
 	const plainPattern = /^([^[\s]+(?:\s+[^[\s]+)*)/;
 	let category = '';
@@ -79,7 +79,7 @@ export const parseCategoryInfo = (inputStr: string) => {
 	}
 	return {
 		category,
-		icon: get(configStore).find((v) => v.category === category)?.icon ?? '',
-		color: get(configStore).find((v) => v.category === category)?.color ?? ''
+		icon: configLists.find((v) => v.category === category)?.icon ?? '',
+		color: configLists.find((v) => v.category === category)?.color ?? ''
 	};
 };

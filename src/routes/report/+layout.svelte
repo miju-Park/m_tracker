@@ -8,6 +8,7 @@
 	import { transactionHandlers, transactionStore } from '../../store/transaction';
 	import { dateStore, previousMonth } from '../../store/date';
 	import { get } from 'svelte/store';
+	import { goto } from '$app/navigation';
 
 	let user: User | null;
 	let config: Config[];
@@ -60,9 +61,13 @@
 </script>
 
 <MonthPicker {year} {month} on:monthChange={handleMonthChange} />
-<Tabs tabStyle="underline">
-	<TabItem open title="Income"></TabItem>
-	<TabItem title="Expense"></TabItem>
-	<TabItem title="Withdraw"></TabItem>
+<Tabs tabStyle="underline" contentClass="bg-transparent">
+	<TabItem open title="Income" on:click={() => goto('/report/income')}
+		><slot {year} {month} /></TabItem
+	>
+	<TabItem title="Expense" on:click={() => goto('/report/expense')}><slot {year} {month} /></TabItem
+	>
+	<TabItem title="Withdraw" on:click={() => goto('/report/expense')}
+		><slot {year} {month} /></TabItem
+	>
 </Tabs>
-<slot {year} {month} />

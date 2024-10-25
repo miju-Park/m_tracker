@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { getTargetDate } from '../../store/utils';
 
 	const dispatch = createEventDispatcher();
 
+	export let month = getTargetDate()?.month ?? 0;
+	export let year = getTargetDate()?.year ?? 0;
 	let date = new Date();
-	export let month = date.getMonth() + 1; // JavaScript months are zero-based
-	export let year = date.getFullYear();
 	export const disabledMove = false;
 
 	function updateMonth(change: number) {

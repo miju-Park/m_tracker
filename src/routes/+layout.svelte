@@ -59,7 +59,7 @@
 </script>
 
 <div
-	class="min-h-screen bg-gradient-to-r from-[#000428] to-[#000046] text-white flex flex-col relative"
+	class="min-h-screen overflow-y-auto bg-gradient-to-r from-[#000428] to-[#000046] text-white flex flex-col relative"
 >
 	<slot />
 </div>

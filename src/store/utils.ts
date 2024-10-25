@@ -30,3 +30,14 @@ export const setDateSearchFilter = (year: number, month: number) => {
 		endDate
 	});
 };
+
+//기준 날짜 기준으로 대상 월 지정
+export const getTargetDate = (date: Date = new Date()) => {
+	if (date.getDate() >= 25) {
+		const isLastMonth = date.getMonth() === 11;
+		return {
+			year: isLastMonth ? date.getFullYear() + 1 : date.getFullYear(),
+			month: isLastMonth ? 1 : date.getMonth() + 2
+		};
+	}
+};

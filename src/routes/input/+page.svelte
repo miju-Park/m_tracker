@@ -69,20 +69,6 @@
 			await transactionHandlers.add(transaction);
 			goto('/dashboard');
 		}
-
-		// try {
-		// 	const response = await fetch('/api/transactions', {
-		// 		method: 'POST',
-		// 		headers: {
-		// 			'Content-Type': 'application/json'
-		// 		},
-		// 		body: JSON.stringify(transaction)
-		// 	});
-		// 	const data = await response.json();
-		// 	console.log(data);
-		// } catch (error) {
-		// 	console.error('Failed to save transaction');
-		// }
 	}
 
 	function handleAmountSubmit(event: CustomEvent<{ amount: number }>) {
