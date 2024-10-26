@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { derived, get } from 'svelte/store';
+	import { derived } from 'svelte/store';
 	import { dateFilter, dateStore, prevDateFilter } from '../../../store/date';
 	import { onMount } from 'svelte';
-	import { configStore, incomeCategories } from '../../../store/configStore';
+	import { incomeCategories } from '../../../store/configStore';
 	import { transactionStore } from '../../../store/transaction';
 	import {
 		Chart,
-		Card,
-		A,
-		Button,
-		Dropdown,
-		DropdownItem,
 		Table,
-		TableHead
+		TableBody,
+		TableBodyCell,
+		TableBodyRow,
+		TableHead,
+		TableHeadCell
 	} from 'flowbite-svelte';
 
 	let year: number;
@@ -27,7 +26,6 @@
 	const incomeSummaries = derived(
 		[transactionStore, dateFilter, prevDateFilter, incomeCategories],
 		([$transactionStore, $dateFilter, $prevDateFilter, $incomeCategories]) => {
-			console.log($dateFilter);
 			const incomeDefaultValue = $incomeCategories.reduce(
 				(acc, cur) => {
 					return {
@@ -35,34 +33,53 @@
 						[cur.category]: {
 							icon: cur.icon,
 							color: cur.color,
-							amount: 0
+							thisAmount: 0,
+							lastAmount: 0
 						}
 					};
 				},
-				{} as Record<string, { icon?: string; color?: string; amount: number }>
+				//카테고리별 상태
+				{} as Record<
+					string,
+					{
+						icon?: string;
+						color?: string;
+						thisAmount: number;
+						lastAmount: number;
+					}
+				>
 			);
 
 			const thisMonth = $transactionStore.filter(
 				(v) =>
-					v.type === 'income' && v.date <= $dateFilter.endTime && v.date >= $dateFilter.startTime
+					v.type === 'income' && v.date < $dateFilter.endTime && v.date >= $dateFilter.startTime
 			);
 			const lastMonth = $transactionStore.filter(
 				(v) =>
 					v.type === 'income' &&
-					v.date <= $prevDateFilter.endTime &&
+					v.date < $prevDateFilter.endTime &&
 					v.date >= $prevDateFilter.startTime
 			);
 
-			return thisMonth.reduce((acc, cur) => {
-				console.log(acc);
+			const thisMonthInfo = thisMonth.reduce((acc, cur) => {
 				return {
 					...acc,
 					[cur.category]: {
 						...acc?.[cur.category],
-						amount: (acc?.[cur.category]?.amount ?? 0) + cur.amount
+						thisAmount: (acc?.[cur.category]?.thisAmount ?? 0) + cur.amount
 					}
 				};
 			}, incomeDefaultValue);
+
+			return lastMonth.reduce((acc, cur) => {
+				return {
+					...acc,
+					[cur.category]: {
+						...acc?.[cur.category],
+						lastAmount: (acc?.[cur.category]?.lastAmount ?? 0) + cur.amount
+					}
+				};
+			}, thisMonthInfo);
 		}
 	);
 
@@ -73,89 +90,130 @@
 	});
 
 	const options = derived(incomeSummaries, ($incomeSummaries) => {
-		return {
-			series: [
-				{
-					name: '이번달 총 수입',
-					color: '#31C48D',
-					data: Object.values($incomeSummaries).map((v) => v.amount.toString())
-				},
-				{
-					name: '지난달 수입 비교',
-					data: ['0', '0', '0', '0'],
-					color: '#F05252'
-				}
-			],
-			chart: {
-				sparkline: {
-					enabled: false
-				},
-				type: 'bar',
-				width: '100%',
-				height: '100%',
-				toolbar: {
-					show: false
-				}
-			},
-			fill: {
-				opacity: 1
-			},
-			plotOptions: {
-				bar: {
-					horizontal: true,
-					columnWidth: '100%',
-					borderRadiusApplication: 'end',
-					borderRadius: 6,
-					dataLabels: {
-						position: 'top'
+		return Object.keys($incomeSummaries).map((category) => {
+			return {
+				series: [
+					{
+						name: '이번달 총 수입',
+						color: '#31C48D',
+						data: [$incomeSummaries[category].thisAmount.toString()]
+					},
+					{
+						name: '지난달 수입 비교',
+						data: [$incomeSummaries[category].lastAmount.toString()],
+						color: '#adb5db'
 					}
-				}
-			},
-			dataLabels: {
-				enabled: true,
-
-				offsetX: 30
-			},
-			xaxis: {
-				labels: {
+				],
+				chart: {
+					sparkline: {
+						enabled: false
+					},
+					type: 'bar' as const,
+					width: '100%',
+					height: '150rem',
+					toolbar: {
+						show: false
+					},
+					background: 'transparent'
+				},
+				legend: {
 					show: false
 				},
-				categories: Object.keys($incomeSummaries).map((k) => `${$incomeSummaries[k].icon} ${k}`),
-				axisTicks: {
+				plotOptions: {
+					bar: {
+						horizontal: true,
+						columnWidth: '100%',
+						barHeight: '51%',
+						borderRadiusApplication: 'end',
+						borderRadius: 6,
+						dataLabels: {
+							position: 'top'
+						}
+					}
+				},
+				tooltip: {
+					shared: true,
+					intersect: false
+				},
+				dataLabels: {
+					enabled: true,
+					offsetX: 0
+				},
+				theme: {
+					mode: 'dark',
+					palette: 'palette4'
+				},
+				stroke: {
+					show: true,
+					width: 1,
+					colors: ['#fff']
+				},
+				//category 종류
+				xaxis: {
+					categories: [`${$incomeSummaries[category].icon} ${category}`],
+					axisTicks: {
+						show: false
+					},
+					labels: {
+						show: false
+					},
+					axisBorder: {
+						show: true,
+						color: '#e0e0e0'
+					}
+				},
+				yaxis: {
 					show: false
 				},
-				axisBorder: {
-					show: false
-				}
-			},
-			yaxis: {
-				labels: {
+				grid: {
 					show: true,
 					style: {
-						fontFamily: 'Inter, sans-serif',
-						cssClass: 'font-bold fill-white opacity-70'
+						cssClass: 'fill-[#666666] border-[#666666]'
+					},
+					xaxis: {
+						lines: {
+							show: false
+						}
+					},
+					yaxis: {
+						lines: {
+							show: false
+						}
+					},
+					strokeDashArray: 4,
+					padding: {
+						top: 0,
+						left: 0,
+						bottom: 0,
+						right: 0
 					}
 				}
-			},
-			grid: {
-				show: true,
-				style: {
-					cssClass: 'fill-gray-400'
-				},
-				strokeDashArray: 4,
-				padding: {
-					left: 2,
-					right: 2,
-					top: -20
-				}
-			}
-		};
+			};
+		});
 	});
 </script>
 
-<div class="px-10 py-4 h-[400px] flex flex-col">
-	<Chart options={$options} />
-	<Table>
-		<TableHead></TableHead>
+<div class="px-10 py-4 grid grid-cols-[1fr_auto]">
+	<div>
+		{#each $options as option}
+			{#if option.series[0].data?.[0] !== '0' && option.series[1].data?.[0] !== '0'}
+				<h1>{option.xaxis.categories[0]}</h1>
+				<Chart options={option} />
+			{/if}
+		{/each}
+	</div>
+	<Table class="flex-1 inline-block dark">
+		<TableHead>
+			<TableHeadCell>Category</TableHeadCell>
+			<TableHeadCell>Total amount</TableHeadCell>
+		</TableHead>
+		<TableBody tableBodyClass="divide-y">
+			{#each $options as option}
+				<TableBodyRow>
+					<TableBodyCell>{option.xaxis.categories[0]}</TableBodyCell>
+					<TableBodyCell>{Number(option.series[0].data?.[0]).toLocaleString()}</TableBodyCell>
+				</TableBodyRow>
+			{/each}
+		</TableBody>
 	</Table>
 </div>

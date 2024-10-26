@@ -3,16 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { Label } from '@/components/ui/label';
 	import { Input } from '@/components/ui/input';
-	import {
-		Content,
-		Popover,
-		PopoverContent,
-		PopoverTrigger,
-		Root,
-		Trigger
-	} from '@/components/ui/popover';
+	import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 	import Calculator from '../../components/Calculator.svelte';
-	import { auth } from '@/firebase/firebase';
 	import { authStore } from '../../store/store';
 	import { transactionHandlers } from '../../store/transaction';
 	import {
@@ -48,7 +40,6 @@
 		value: 'income',
 		label: '수입'
 	};
-	let category = '';
 	let memo = '';
 	let inputCategory = {
 		label: '',
@@ -78,35 +69,31 @@
 			await transactionHandlers.add(transaction);
 			goto('/dashboard');
 		}
-
-		// try {
-		// 	const response = await fetch('/api/transactions', {
-		// 		method: 'POST',
-		// 		headers: {
-		// 			'Content-Type': 'application/json'
-		// 		},
-		// 		body: JSON.stringify(transaction)
-		// 	});
-		// 	const data = await response.json();
-		// 	console.log(data);
-		// } catch (error) {
-		// 	console.error('Failed to save transaction');
-		// }
 	}
 
 	function handleAmountSubmit(event: CustomEvent<{ amount: number }>) {
-		amount = event.detail.amount.toLocaleString();
-		popoverIsOpen = false;
+		amount = event.detail.amount;
+		popover.calculatorOpen = false;
 	}
 </script>
 
-<div in:fly={{ y: 200, duration: 500 }}>
-	<h1>가계부 입력</h1>
-
-	<form on:submit|preventDefault={handleSubmit}>
-		<div class="flex w-full justify-start max-w-sm flex-col gap-1.5">
-			<Label class="text-[#1abc9c] font-bold px-4">날짜</Label>
-			<Datepicker bind:value={date} />
+<form
+	on:submit|preventDefault={handleSubmit}
+	class="flex flex-col justify-between h-screen"
+	in:fly={{ y: 200, duration: 500 }}
+>
+	<div class="flex flex-col gap-4">
+		<div class="flex w-full max-w-sm flex-col gap-1.5">
+			<Label class="text-[#1abc9c] font-bold">타입</Label>
+			<Select bind:selected={type}>
+				<SelectTrigger>
+					<SelectValue />
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem value="income">수입</SelectItem>
+					<SelectItem value="expense">지출</SelectItem>
+				</SelectContent>
+			</Select>
 		</div>
 		<div class="flex flex-col w-full">
 			<Label class="text-[#1abc9c] font-bold">금액</Label>
@@ -119,29 +106,20 @@
 				<PopoverTrigger>
 					<Input bind:value={amount} class="border-0 rounded-none border-b-2 border-white w-full" />
 				</PopoverTrigger>
-				<PopoverContent align="start" class="w-[350px] p-0 bg-transparent border-none">
+				<PopoverContent align="center" class="w-[350px] p-0 bg-transparent border-none">
 					<Calculator on:submit={handleAmountSubmit} />
 				</PopoverContent>
 			</Popover>
 		</div>
-		<div class="flex w-full max-w-sm flex-col gap-1.5">
-			<Label class="text-[#1abc9c] font-bold px-4">타입</Label>
-			<Select bind:selected={type}>
-				<SelectTrigger>
-					<SelectValue />
-				</SelectTrigger>
-				<SelectContent>
-					<SelectItem value="income">수입</SelectItem>
-					<SelectItem value="expense">지출</SelectItem>
-				</SelectContent>
-			</Select>
+		<div class="flex w-full justify-start max-w-sm flex-col gap-1.5">
+			<Label class="text-[#1abc9c] font-bold">날짜</Label>
+			<Datepicker bind:value={date} />
 		</div>
-
 		<div class="flex flex-col justify-start w-full">
-			<Label class="text-[#1abc9c] font-bold px-4">카테고리</Label>
+			<Label class="text-[#1abc9c] font-bold">카테고리</Label>
 			<Popover open={popover.categoryOpen} onOpenChange={(val) => (popover.categoryOpen = val)}>
 				<PopoverTrigger class="w-full">
-					<Button class={`w-full rounded-md bg-[${inputCategory.color}]`}>
+					<Button class={`w-full text-start rounded-md bg-[${inputCategory.color}]`}>
 						{#if inputCategory.label}
 							{inputCategory.label}
 						{:else}
@@ -197,15 +175,19 @@
 				</PopoverContent>
 			</Popover>
 		</div>
-
-		<div class="flex flex-col w-full gap-1.5">
-			<Label class="text-[#1abc9c] font-bold px-4">메모</Label>
-			<Textarea id="memo" bind:value={memo}></Textarea>
+		<div>
+			<Label class="text-[#1abc9c] font-bold">내용</Label>
+			<Input bind:value={description} class="border-none" />
 		</div>
 
-		<Button type="submit" class="w-full bg-[#1abc9c]">저장</Button>
-	</form>
-</div>
+		<div class="flex flex-col w-full gap-1.5">
+			<Label class="text-[#1abc9c] font-bold">메모</Label>
+			<Textarea id="memo" bind:value={memo}></Textarea>
+		</div>
+	</div>
+
+	<Button type="submit" class="w-full bg-[#1abc9c]">저장</Button>
+</form>
 
 <style>
 	form {

@@ -15,14 +15,16 @@
 	import MonthPicker from '@/components/MonthPicker.svelte';
 	import InputShortcut from '@/components/InputShortcut.svelte';
 	import { Timestamp } from 'firebase/firestore';
-	import { configHandler, configStore } from '../../store/configStore';
 	import { Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte';
 	import Summary from '@/components/Summary.svelte';
 	import { dateStore } from '../../store/date';
+	import { configStore } from '../../store/configStore';
 
 	let user: User | null;
-	let year: number | null;
-	let month: number | null;
+	let year: number;
+	let month: number;
+	let configList: Config[] = [];
+	let transactionLists: Record<string, TransactionType[]> = {};
 
 	const fetchTransaction = async (userId: string, year: number | null, month: number | null) => {
 		if (userId && year && month) {
@@ -43,8 +45,7 @@
 	async function deleteTransaction(transactionId: string) {
 		if (user?.uid) {
 			await transactionHandlers.remove(transactionId);
-			// 트랜잭션 삭제 후 목록 다시 불러오기
-			await fetchTransaction(user.uid, year, month);
+			transactionStore.update((cur) => cur.filter((v) => v.id !== transactionId));
 		}
 	}
 
@@ -68,6 +69,15 @@
 		}
 	});
 
+	const unsubConfig = configStore.subscribe((cur) => {
+		configList = cur;
+	});
+
+	// 날짜 기준으로 grouping
+	const unsubTransaction = groupedTransations.subscribe((cur) => {
+		transactionLists = cur;
+	});
+
 	const insertDb = async (
 		event: CustomEvent<{
 			type: string;
@@ -89,7 +99,12 @@
 	};
 
 	onMount(() => {
-		return () => unsubscribe();
+		return () => {
+			unsubscribe();
+			unsubscribeDate();
+			unsubConfig();
+			unsubTransaction();
+		};
 	});
 </script>
 
@@ -97,7 +112,7 @@
 	<div class="mainContainer">
 		<div class="headerContainer">
 			<div class="flex gap-2 bg-[#1abc9c] items-center justify-center">
-				<MonthPicker on:monthChange={handleMonthChange} />
+				<MonthPicker on:monthChange={handleMonthChange} {year} {month} />
 				<div class="w-[1px] h-full bg-white" />
 				<Summary />
 			</div>
@@ -106,33 +121,36 @@
 			</div>
 		</div>
 		<main class="w-full listContainer">
-			{#if Object.keys($groupedTransations).length > 0}
+			{#if Object.keys(transactionLists).length > 0}
 				<Table class="bg-transparent" noborder>
-					{#each Object.keys($groupedTransations) as date}
+					{#each Object.keys(transactionLists) as date}
 						<h1 class="dateHeader">
 							{dayjs(date).format('MM/DD')} ({getDayOfWeek(new Date(date))})
 						</h1>
-						<!-- <table class="transactions-table"> -->
 						<TableBody tableBodyClass="bg-transparent">
-							{#each $groupedTransations[date] as transaction}
-								{@const categoryInfo = parseCategoryInfo(transaction.category)}
-								<TableBodyRow class="bg-transparent py-7">
-									<TableBodyCell
-										><span
+							{#each transactionLists[date] as transaction}
+								{@const categoryInfo = parseCategoryInfo(configList, transaction.category)}
+								<TableBodyRow class="bg-transparent py-7 relative group">
+									<TableBodyCell>
+										<Button
 											class="p-2 rounded-3xl whitespace-nowrap mr-2 my-auto"
 											style={`background-color: ${categoryInfo.color}`}
+											on:click={() => {
+												goto('/report');
+											}}
 										>
 											{categoryInfo.icon}
 											{transaction.category}
-										</span>
+										</Button>
 									</TableBodyCell>
 									<TableBodyCell class="text-white">{transaction.description || ''}</TableBodyCell>
 									<TableBodyCell class="text-white"
 										>{Number(transaction.amount)?.toLocaleString()}원</TableBodyCell
 									>
 
-									<button class="delete-button" on:click={() => deleteTransaction(transaction.id)}
-										>삭제</button
+									<button
+										class="delete-button group-hover:block"
+										on:click={() => deleteTransaction(transaction.id)}>삭제</button
 									>
 								</TableBodyRow>
 							{/each}
@@ -168,38 +186,11 @@
 		overflow: auto;
 		scrollbar-gutter: stable; /* Reserves space for the scrollbar */
 	}
-	.transactions-table {
-		width: 100%;
-		max-width: 800px;
-		margin: 0 auto;
-		border-collapse: collapse;
-	}
 
-	.transactions-table th,
-	.transactions-table td {
-		padding: 8px;
-		text-align: left;
-	}
-
-	.transactions-table th {
-		background-color: #f2f2f2;
-	}
-
-	@media (max-width: 768px) {
-		.transactions-table th,
-		.transactions-table td {
-			padding: 6px;
-			font-size: 14px;
-		}
-	}
 	.dateHeader {
 		margin-top: 20px;
 	}
 
-	.mainContainer {
-		padding: 1rem 0;
-		width: 100%;
-	}
 	.headerContainer {
 		width: 100%;
 		padding: 0rem 5rem;
@@ -214,39 +205,11 @@
 			padding: 0rem 2rem;
 		}
 	}
-	.transactions {
-		list-style-type: none;
-		padding: 0;
-		display: flex;
-		margin: 0 auto;
-		flex-direction: column;
-	}
-	.transaction {
-		display: flex;
-		position: relative;
-		justify-content: space-between; /* 여백 최소화 */
-		align-items: center;
-		padding: 8px;
-		margin: 0 auto; /* 가운데 정렬 */
-		width: 80%; /* 화면에 맞게 너비 조정 */
-		max-width: 800px; /* 최대 너비 설정 */
-	}
 
-	.transaction .category {
-		display: flex;
-		align-items: center;
-		border-radius: 2rem;
-		white-space: nowrap; /* 줄바꿈 방지 */
-		margin-right: 8px; /* 아이콘과 텍스트 사이의 간격 */
-	}
-
-	.transaction .category-icon {
-		margin-right: 4px; /* 아이콘과 텍스트 사이의 간격 */
-	}
 	.delete-button {
 		display: none;
 		position: absolute;
-		right: -2rem;
+		right: 0;
 		top: 50%;
 		transform: translateY(-50%);
 		background-color: red;
@@ -256,19 +219,7 @@
 		padding: 5px 10px;
 		cursor: pointer;
 	}
-	.transaction:hover .delete-button {
-		display: block;
-	}
 
-	@media (max-width: 768px) {
-		.transaction {
-			flex-direction: row;
-			align-items: center;
-		}
-		.transaction div {
-			flex: 1;
-		}
-	}
 	/* 새로운 스타일 추가 */
 	@media (max-width: 768px) {
 		.hide-on-mobile {
