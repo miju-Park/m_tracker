@@ -130,10 +130,10 @@
 						<TableBody tableBodyClass="bg-transparent">
 							{#each transactionLists[date] as transaction}
 								{@const categoryInfo = parseCategoryInfo(configList, transaction.category)}
-								<TableBodyRow class="bg-transparent py-7 relative group">
+								<TableBodyRow class="bg-transparent py-7 relative rounded group hover:bg-[#000A5A]">
 									<TableBodyCell>
 										<Button
-											class="p-2 rounded-3xl whitespace-nowrap mr-2 my-auto"
+											class="p-2 px-4 rounded-3xl whitespace-nowrap mr-2 my-auto"
 											style={`background-color: ${categoryInfo.color}`}
 											on:click={() => {
 												goto('/report');
