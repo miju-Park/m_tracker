@@ -1,38 +1,51 @@
-# create-svelte
+# Money Tracker
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+> svelte 4.0 으로 작성되어 있어 5.0 버전으로 업데이트 할 예정!!
 
-## Creating a project
+개인 자산 관리 시스템
 
-If you're seeing this, you've probably already done this step. Congrats!
+개인별 수입,지출 내역을 관리하고 월별 통계
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## 프로젝트 추가 링크
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+https://m-tracker-six.vercel.app/
 
-## Developing
+## 프로젝트 개발환경 및 사용기술
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+IDE : IntelliJ
 
-```bash
-npm run dev
+Language : Typescript
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+Framework : Sveltekit
 
-## Building
+Build : Vite
 
-To create a production version of your app:
+Database : Firestore
 
-```bash
-npm run build
-```
+CI & CD : Github
 
-You can preview the production build with `npm run preview`.
+Deploy : Vercel
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## 사용 라이브러리
+
+shadcn-svelte
+flowbite
+
+> 컴포넌트를 flowbite 사용으로 전환할 예정..!
+
+## 시스템 아키텍쳐
+
+인프라, FE, BE 구조를 사진 한장으로 표현하기
+
+## 데이터베이스 구조
+
+ERD 설계하기 TBD
+
+## 주요 기능 설명
+
+각 기능별 상세 내용 TBD
+
+## 라이선스 정보
+
+어떤 라이선스로 배포되는지
+프로젝트를 사용함에 있어 제약 조건이 있는지 (특허, 상업적 사용)
