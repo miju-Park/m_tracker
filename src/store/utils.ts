@@ -2,7 +2,9 @@ import { Timestamp } from 'firebase/firestore';
 import { writable } from 'svelte/store';
 import { transactionFilter } from './transaction';
 
-export function createUniqueStore<T extends { id: string }>(initialValue: Array<T> = []) {
+export function createUniqueStore<T extends { id: string; date?: Timestamp }>(
+	initialValue: Array<T> = []
+) {
 	const { subscribe, set, update } = writable(initialValue);
 
 	return {
@@ -14,7 +16,9 @@ export function createUniqueStore<T extends { id: string }>(initialValue: Array<
 				const uniqueNewItems = newItems.filter(
 					(newItem) => !items.some((existingItem) => existingItem.id === newItem.id)
 				);
-				return [...items, ...uniqueNewItems];
+				return [...items, ...uniqueNewItems].sort(
+					(a, b) => (b?.date?.seconds ?? 0) - (a?.date?.seconds ?? 0)
+				);
 			});
 		}
 	};
@@ -38,6 +42,11 @@ export const getTargetDate = (date: Date = new Date()) => {
 		return {
 			year: isLastMonth ? date.getFullYear() + 1 : date.getFullYear(),
 			month: isLastMonth ? 1 : date.getMonth() + 2
+		};
+	} else {
+		return {
+			year: date.getFullYear(),
+			month: date.getMonth() + 1
 		};
 	}
 };
