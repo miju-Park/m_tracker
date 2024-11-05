@@ -8,7 +8,7 @@ export const dateStore = writable<{ year: number; month: number }>(getTargetDate
 export const previousMonth = derived(dateStore, ($dateStore) => {
 	return {
 		year: $dateStore.month === 1 ? $dateStore.year - 1 : $dateStore.year,
-		month: $dateStore.month === 1 ? 12 : $dateStore.month - 2
+		month: $dateStore.month === 1 ? 12 : $dateStore.month - 1
 	};
 });
 
@@ -34,6 +34,6 @@ export const prevDateFilter = derived(previousMonth, ($previousMonth) => {
 				}-${$previousMonth.month === 0 ? 12 : $previousMonth.month - 1}-25`
 			)
 		),
-		endTime: Timestamp.fromDate(new Date($previousMonth.year, $previousMonth.month, 24))
+		endTime: Timestamp.fromDate(new Date($previousMonth.year, $previousMonth.month - 1, 24))
 	};
 });
