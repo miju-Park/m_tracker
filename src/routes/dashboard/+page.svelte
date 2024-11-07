@@ -130,10 +130,12 @@
 						<TableBody tableBodyClass="bg-transparent">
 							{#each transactionLists[date] as transaction}
 								{@const categoryInfo = parseCategoryInfo(configList, transaction.category)}
-								<TableBodyRow class="bg-transparent py-7 relative rounded group hover:bg-[#000A5A]">
+								<TableBodyRow
+									class="bg-transparent py-7 relative rounded group hover:bg-[#000A5A] grid grid-cols-2 sm:table-row"
+								>
 									<TableBodyCell>
 										<Button
-											class="p-2 px-4 rounded-3xl whitespace-nowrap mr-2 my-auto"
+											class="p-2 sm:px-4 rounded-3xl whitespace-nowrap mr-2 my-auto flex-wrap"
 											style={`background-color: ${categoryInfo.color}`}
 											on:click={() => {
 												goto('/report');
@@ -143,8 +145,16 @@
 											{transaction.category}
 										</Button>
 									</TableBodyCell>
-									<TableBodyCell class="text-white">{transaction.description || ''}</TableBodyCell>
-									<TableBodyCell class="text-white"
+									<!-- 모바일 화면 대응 -->
+									<TableBodyCell class="text-white flex flex-col sm:hidden">
+										<span>{transaction.description || ''}</span>
+										<span>{Number(transaction.amount)?.toLocaleString()}원</span>
+									</TableBodyCell>
+									<!-- 일반 화면 -->
+									<TableBodyCell class="text-white hidden sm:table-cell"
+										>{transaction.description || ''}</TableBodyCell
+									>
+									<TableBodyCell class="text-white hidden sm:table-cell"
 										>{Number(transaction.amount)?.toLocaleString()}원</TableBodyCell
 									>
 
@@ -207,7 +217,7 @@
 	}
 	@media (max-width: 768px) {
 		.listContainer {
-			padding: 0rem 2rem;
+			padding: 0rem 1rem;
 		}
 	}
 
