@@ -24,7 +24,7 @@
 	});
 </script>
 
-<div class="grid grid-cols-2 gap-2">
+<div class="grid grid-cols-[1fr_auto] gap-x-3 gap-y-2">
 	<span class="font-bold opacity-70">총 수입</span>
 	{$summariedTransactions.income.toLocaleString()} 원
 

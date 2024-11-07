@@ -195,6 +195,11 @@
 		width: 100%;
 		padding: 0rem 5rem;
 	}
+	@media (max-width: 768px) {
+		.headerContainer {
+			padding: 0rem;
+		}
+	}
 
 	.listContainer {
 		padding: 0rem 12rem;
