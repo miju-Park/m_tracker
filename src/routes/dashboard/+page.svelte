@@ -108,6 +108,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>대시보드</title>
+</svelte:head>
+
 {#if !$authStore.loading}
 	<div class="mainContainer">
 		<div class="headerContainer">
