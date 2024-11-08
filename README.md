@@ -1,51 +1,52 @@
 # Money Tracker
 
-> svelte 4.0 으로 작성되어 있어 5.0 버전으로 업데이트 할 예정!!
+![logo](static/logo_image_2.png)
 
-개인 자산 관리 시스템
+# Money Tracker
 
-개인별 수입,지출 내역을 관리하고 월별 통계
+> 개인 자산 관리 시스템 <br/>
+> 개발 기간 : 24.10 ~ 진행중
 
-## 프로젝트 추가 링크
+## 배포 주소
 
-https://m-tracker-six.vercel.app/
+> https://m-tracker-six.vercel.app/
 
-## 프로젝트 개발환경 및 사용기술
+## 프로젝트 소개
 
-IDE : IntelliJ
+여러분의 지갑 건강을 책임질 똑똑한 가계부 앱을 소개합니다!
 
-Language : Typescript
+수입과 지출을 쉽게 기록하고, 예산 관리부터 월별 비교까지 한눈에 볼 수 있어요.
 
-Framework : Sveltekit
+PC나 스마트폰 어디서든 편하게 사용할 수 있으니, 이제 여러분의 돈관리 파트너로 함께해볼까요?
 
-Build : Vite
+## 시작 가이드
 
-Database : Firestore
+로컬 실행
 
-CI & CD : Github
+```bash
+npm install
+npm run dev
+```
 
-Deploy : Vercel
+---
 
-## 사용 라이브러리
+## Stacks 🛠️
 
-shadcn-svelte
-flowbite
+![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
+![Svelte](https://img.shields.io/badge/svelte-%23f1413d.svg?style=for-the-badge&logo=svelte&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34)
+![Shadcn/ui](https://img.shields.io/badge/shadcn/ui-000000?style=for-the-badge&logo=shadcn/ui&logoColor=white)
 
-> 컴포넌트를 flowbite 사용으로 전환할 예정..!
+---
 
-## 시스템 아키텍쳐
+## 화면 구성
 
-인프라, FE, BE 구조를 사진 한장으로 표현하기
+## 주요 기능
 
-## 데이터베이스 구조
+--
 
-ERD 설계하기 TBD
+## 아키텍쳐
 
-## 주요 기능 설명
-
-각 기능별 상세 내용 TBD
-
-## 라이선스 정보
-
-어떤 라이선스로 배포되는지
-프로젝트를 사용함에 있어 제약 조건이 있는지 (특허, 상업적 사용)
+### 디렉토리 구조
