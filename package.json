@@ -33,6 +33,7 @@
 		"tailwindcss": "^3.4.13",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0",
+		"vaul-svelte": "^0.3.2",
 		"vite": "^5.0.3"
 	},
 	"type": "module",
@@ -45,6 +46,7 @@
 		"dayjs": "^1.11.13",
 		"firebase": "^10.13.2",
 		"lucide-svelte": "^0.441.0",
+		"svelte-legos": "^0.2.5",
 		"svelte-radix": "^1.1.1",
 		"tailwind-merge": "^2.5.2",
 		"tailwind-variants": "^0.2.1"
