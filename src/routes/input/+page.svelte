@@ -80,7 +80,7 @@
 
 <form
 	on:submit|preventDefault={handleSubmit}
-	class="flex flex-col justify-between h-screen"
+	class="flex flex-col justify-between h-dvh"
 	in:fly={{ y: 200, duration: 500 }}
 >
 	<div class="flex flex-col gap-4">
