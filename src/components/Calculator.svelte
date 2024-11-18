@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
+
+	export let initialValue;
 	let expression = writable(''); // 계산식
-	let result = writable(''); // 결과값
+	let result = writable(initialValue || ''); // 결과값
 
 	const dispatch = createEventDispatcher<{ submit: { amount: number } }>();
 
@@ -43,6 +45,13 @@
 			dispatch('submit', { amount: Number($result) }); // Submit on Enter
 		}
 	};
+
+	onMount(() => {
+		if (initialValue) {
+			updateExpression(`${Number(initialValue)}`);
+			calculateResult();
+		}
+	});
 </script>
 
 <svelte:document on:keydown={handleKeyDown} />
