@@ -34,7 +34,9 @@
 {:else}
 	<Drawer.Root bind:open>
 		<Drawer.Trigger asChild let:builder>
-			<Button variant="outline" builders={[builder]}>{triggerTargetValue}</Button>
+			<Button variant="outline" class={triggerClassName} builders={[builder]}
+				>{triggerTargetValue}</Button
+			>
 		</Drawer.Trigger>
 		<Drawer.Content>
 			<Drawer.Header class="text-left">
