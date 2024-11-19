@@ -22,6 +22,7 @@
 	import type { Selected } from 'bits-ui';
 	import { get } from 'svelte/store';
 	import { expenseCategories, incomeCategories, withdrawCategories } from '../../store/configStore';
+	import ResponsiveModal from '../../components/ResponsiveModal.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -167,19 +168,14 @@
 
 	<div class="flex flex-col">
 		<Label class="text-[#1abc9c] font-bold">금액</Label>
-		<Popover
+		<ResponsiveModal
+			triggerTargetValue={amount ? `${amount.toLocaleString()}` : ''}
+			title="금액 입력"
+			triggerClassName="min-w-[200px] bg-transparent border-none justify-start p-0"
 			open={popover.calculatorOpen}
-			onOpenChange={(val) => {
-				popover.calculatorOpen = val;
-			}}
 		>
-			<PopoverTrigger>
-				<Input bind:value={amount} class="border-none border-b-2 border-white" />
-			</PopoverTrigger>
-			<PopoverContent align="end" class="w-[350px] p-0 bg-transparent border-none">
-				<Calculator on:submit={handleAmountSubmit} />
-			</PopoverContent>
-		</Popover>
+			<Calculator on:submit={handleAmountSubmit} initialValue={amount} />
+		</ResponsiveModal>
 	</div>
 
 	<Button variant="ghost" class="hover:bg-[#1abc9c]" on:click={handleSubmit}>입력</Button>

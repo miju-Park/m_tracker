@@ -31,11 +31,12 @@
 	import { Timestamp } from 'firebase/firestore';
 	import { expenseCategories, incomeCategories } from '../../store/configStore';
 	import { get } from 'svelte/store';
+	import ResponsiveModal from '../../components/ResponsiveModal.svelte';
 
 	let description = '';
 	let today = dayjs();
 	let date = new CalendarDate(today.year(), today.month() + 1, today.date());
-	let amount = '';
+	let amount: null | number = null;
 	let type: Selected<string> = {
 		value: 'income',
 		label: '수입'
@@ -79,7 +80,7 @@
 
 <form
 	on:submit|preventDefault={handleSubmit}
-	class="flex flex-col justify-between h-screen"
+	class="flex flex-col justify-between h-dvh"
 	in:fly={{ y: 200, duration: 500 }}
 >
 	<div class="flex flex-col gap-4">
@@ -97,19 +98,14 @@
 		</div>
 		<div class="flex flex-col w-full">
 			<Label class="text-[#1abc9c] font-bold">금액</Label>
-			<Popover
+			<ResponsiveModal
+				triggerTargetValue={amount ? `${amount.toLocaleString()}` : ''}
+				title="금액 입력"
+				triggerClassName="bg-transparent border-none justify-start p-0"
 				open={popover.calculatorOpen}
-				onOpenChange={(val) => {
-					popover.calculatorOpen = val;
-				}}
 			>
-				<PopoverTrigger>
-					<Input bind:value={amount} class="border-0 rounded-none border-b-2 border-white w-full" />
-				</PopoverTrigger>
-				<PopoverContent align="center" class="w-[350px] p-0 bg-transparent border-none">
-					<Calculator on:submit={handleAmountSubmit} />
-				</PopoverContent>
-			</Popover>
+				<Calculator on:submit={handleAmountSubmit} initialValue={amount} />
+			</ResponsiveModal>
 		</div>
 		<div class="flex w-full justify-start max-w-sm flex-col gap-1.5">
 			<Label class="text-[#1abc9c] font-bold">날짜</Label>
