@@ -4,7 +4,8 @@
 	import { onMount } from 'svelte';
 	import { expenseCategories } from '../../../store/configStore';
 	import { transactionStore } from '../../../store/transaction';
-	import { Chart, Table, TableHead, TableHeadCell } from 'flowbite-svelte';
+	import UsageCell from './UsageCell.svelte';
+	import * as Table from '$lib/components/ui/table';
 
 	let year: number;
 	let month: number;
@@ -17,21 +18,19 @@
 	const expenseSummaries = derived(
 		[transactionStore, dateFilter, expenseCategories],
 		([$transactionStore, $dateFilter, $expenseCategories]) => {
-			const expenseDefaultValue = $expenseCategories.reduce(
-				(acc, cur) => {
-					const category = `[${cur.category}] ${cur.subCategory}`;
+			const expenseDefaultValue = $expenseCategories
+				.sort((a, b) => {
+					return a.category.localeCompare(b.category);
+				})
+				.map((cur) => {
 					return {
-						...acc,
-						[category]: {
-							icon: cur.icon,
-							color: cur.color,
-							amount: 0,
-							budget: cur?.budget ?? 0
-						}
+						category: `[${cur.category}] ${cur.subCategory}`,
+						icon: cur.icon,
+						color: cur.color,
+						amount: 0,
+						budget: cur?.budget ?? 0
 					};
-				},
-				{} as Record<string, { icon?: string; color?: string; amount: number; budget: number }>
-			);
+				});
 
 			return $transactionStore
 				.filter(
@@ -39,128 +38,48 @@
 						v.type === 'expense' && v.date <= $dateFilter.endTime && v.date >= $dateFilter.startTime
 				)
 				.reduce((acc, cur) => {
-					return {
-						...acc,
-						[cur.category]: {
-							...acc?.[cur.category],
-							amount: (acc?.[cur.category]?.amount ?? 0) + cur.amount
-						}
-					};
+					return acc.map((a) =>
+						a.category === cur.category
+							? {
+									...a,
+									amount: cur.amount + a.amount
+								}
+							: a
+					);
 				}, expenseDefaultValue);
 		}
 	);
 
+	
 	onMount(() => {
 		return () => {
 			unsubDate();
 		};
 	});
-
-	const options = derived(expenseSummaries, ($expenseSummaries) => {
-		return {
-			series: [
-				{
-					name: 'Actual',
-					data: Object.keys($expenseSummaries).map((k) => $expenseSummaries[k].amount)
-				},
-				{
-					name: 'Remaining',
-					data: Object.keys($expenseSummaries).map((k) =>
-						Math.max(0, $expenseSummaries[k].budget - $expenseSummaries[k].amount)
-					)
-				}
-			],
-			chart: {
-				type: 'bar' as const,
-				stacked: true,
-				stackType: '100%',
-				toolbar: {
-					show: false
-				},
-				background: 'transparent'
-			},
-			plotOptions: {
-				bar: {
-					horizontal: true,
-					barHeight: '60%',
-					borderRadiusApplication: 'end'
-				}
-			},
-			legend: {
-				show: false
-			},
-			stroke: {
-				width: 1,
-				colors: ['#fff']
-			},
-			title: {
-				text: '100% Stacked Bar'
-			},
-			theme: {
-				mode: 'dark',
-				palette: 'palette4'
-			},
-			xaxis: {
-				categories: Object.keys($expenseSummaries),
-				axisTicks: {
-					show: false
-				},
-				labels: {
-					show: false
-				},
-				axisBorder: {
-					show: true,
-					color: '#e0e0e0'
-				}
-			},
-			tooltip: {
-				y: {
-					formatter: function (val: number) {
-						return val.toLocaleString();
-					}
-				}
-			},
-			yaxis: {
-				show: true
-			},
-			grid: {
-				show: true,
-				style: {
-					cssClass: 'fill-[#666666] border-[#666666]'
-				},
-				xaxis: {
-					lines: {
-						show: false
-					}
-				},
-				yaxis: {
-					lines: {
-						show: true
-					}
-				},
-				strokeDashArray: 4
-			}
-		};
-	});
 </script>
 
-<div class="px-10 py-4 h-[400px] flex flex-col">
-	<Chart class="dark" options={$options} />
-
-	<Table class="flex-1 inline-block dark">
-		<TableHead>
-			<TableHeadCell>Category</TableHeadCell>
-			<TableHeadCell>Budget</TableHeadCell>
-			<TableHeadCell>Total amount</TableHeadCell>
-		</TableHead>
-		<!-- <TableBody tableBodyClass="divide-y">
-			{#each $options as option}
-				<TableBodyRow>
-					<TableBodyCell>{option.xaxis.categories[0]}</TableBodyCell>
-					<TableBodyCell></TableBodyCell>
-					<TableBodyCell>{Number(option.series[0].data?.[0]).toLocaleString()}</TableBodyCell>
-				</TableBodyRow>
+<div class="px-10 py-4 flex flex-col">
+	<Table.Root>
+		<Table.Caption>Track your monthly expenses and budget</Table.Caption>
+		<Table.Header>
+			<Table.Row>
+				<Table.Head>Category</Table.Head>
+				<Table.Head>Spent</Table.Head>
+				<Table.Head>Bedget</Table.Head>
+				<Table.Head class="text-right">Usage</Table.Head>
+			</Table.Row>
+		</Table.Header>
+		<Table.Body>
+			{#each $expenseSummaries as summary}
+				<Table.Row>
+					<Table.Cell>{summary.icon} {summary.category}</Table.Cell>
+					<Table.Cell>{summary.amount}</Table.Cell>
+					<Table.Cell>{summary.budget}</Table.Cell>
+					<Table.Cell class="text-right">
+						<UsageCell budget={summary.budget} amount={summary.amount} />
+					</Table.Cell>
+				</Table.Row>
 			{/each}
-		</TableBody> -->
-	</Table>
+		</Table.Body>
+	</Table.Root>
 </div>

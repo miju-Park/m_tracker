@@ -161,7 +161,7 @@
 		</Popover>
 	</div>
 
-	<div>
+	<div class="flex flex-col">
 		<Label class="text-[#1abc9c] font-bold px-4">내용</Label>
 		<Input bind:value={description} class="border-none" />
 	</div>
