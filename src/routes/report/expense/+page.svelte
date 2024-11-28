@@ -50,6 +50,58 @@
 		}
 	);
 
+	const familyEventEvent = (data:typeof expenseSummaries[0])=>{
+		return data.category.includes('부모님') || data.category==='[교통] 기차' || data.category==='[경조사] 경조사' ;
+	}
+	const comsumptionCategory = (data: typeof expenseSummaries[0])=>{
+		switch(data.category) {
+			case '[건강] 건강식품':
+			case '[건강] 약국':
+			case '[건강] 병원':
+			case '[건강] 건강식품':
+			case '[경조사] 선물':
+			case '[교통] 대중교통':
+			case '[교통] 자동차관련':
+			case '[교통] 택시':
+			case '[교통] 주유':
+			case '[문화생활] 여행':
+			case '[문화생활] 문화생활':
+			case '[생필품] 생필품':
+			case '[생필품] 자동차용품':
+			case '[식비] 술, 유흥':
+			case '[식비] 마트, 장보기':
+			case '[식비] 배달, 외식':
+			case '[식비] 카페':
+			case '[패션/미용] 의류':
+			case '[패션/미용] 헤어/뷰티':
+			case '[패션/미용] 세탁비':
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	const extraSummary = derived([expenseSummaries],([summary])=>{
+		return summary.reduce((iter,cur)=>{
+			//경조사비
+			if(familyEventEvent(cur)){
+				return {
+					...iter,
+					familyEvent: iter.familyEvent+(cur.budget-cur.amount)
+				}
+			} else if(comsumptionCategory(cur)) {
+				return {
+					...iter,
+					consumption: iter.consumption+(cur.budget-cur.amount)
+				}
+			} else {
+				return iter;
+			}
+		},{
+			familyEvent:0,
+			consumption:0
+		})
+	})
 	
 	onMount(() => {
 		return () => {
@@ -65,7 +117,7 @@
 			<Table.Row>
 				<Table.Head>Category</Table.Head>
 				<Table.Head>Spent</Table.Head>
-				<Table.Head>Bedget</Table.Head>
+				<Table.Head>Budget</Table.Head>
 				<Table.Head class="text-right">Usage</Table.Head>
 			</Table.Row>
 		</Table.Header>
@@ -83,12 +135,12 @@
 		</Table.Body>
 		<Table.Footer>
 			<Table.Row>
-				<Table.Cell colspan={2}>저축금액(to 소비통장)</Table.Cell>
-				<Table.Cell colspan={2}>원</Table.Cell>
+				<Table.Cell class="text-right" colspan={2}>저축금액(to 소비통장)</Table.Cell>
+				<Table.Cell colspan={2}>{$extraSummary.consumption.toLocaleString()}원</Table.Cell>
 			</Table.Row>
 			<Table.Row>
-				<Table.Cell colspan={2}>저축금액(to 경조사통장)</Table.Cell>
-				<Table.Cell colspan={2}>원</Table.Cell>
+				<Table.Cell class="text-right" colspan={2}>저축금액(to 경조사통장)</Table.Cell>
+				<Table.Cell colspan={2}>{$extraSummary.familyEvent.toLocaleString()}원</Table.Cell>
 			</Table.Row>
 		</Table.Footer>
 	</Table.Root>
