@@ -14,11 +14,12 @@ export const previousMonth = derived(dateStore, ($dateStore) => {
 
 export const dateFilter = derived(dateStore, ($dateStore) => {
 	return {
+		//25년 1월 : 24년 12월 ~ 25년 1월
 		startTime: Timestamp.fromDate(
 			new Date(
 				`${
 					$dateStore.month === 1 ? $dateStore.year - 1 : $dateStore.year
-				}-${$dateStore.month === 0 ? 12 : $dateStore.month - 1}-25`
+				}-${$dateStore.month === 1 ? 12 : $dateStore.month - 1}-25`
 			)
 		),
 		endTime: Timestamp.fromDate(new Date($dateStore.year, $dateStore.month - 1, 24))
@@ -31,7 +32,7 @@ export const prevDateFilter = derived(previousMonth, ($previousMonth) => {
 			new Date(
 				`${
 					$previousMonth.month === 1 ? $previousMonth.year - 1 : $previousMonth.year
-				}-${$previousMonth.month === 0 ? 12 : $previousMonth.month - 1}-25`
+				}-${$previousMonth.month === 1 ? 12 : $previousMonth.month - 1}-25`
 			)
 		),
 		endTime: Timestamp.fromDate(new Date($previousMonth.year, $previousMonth.month - 1, 24))
