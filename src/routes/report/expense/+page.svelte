@@ -81,5 +81,15 @@
 				</Table.Row>
 			{/each}
 		</Table.Body>
+		<Table.Footer>
+			<Table.Row>
+				<Table.Cell colspan={2}>저축금액(to 소비통장)</Table.Cell>
+				<Table.Cell colspan={2}>원</Table.Cell>
+			</Table.Row>
+			<Table.Row>
+				<Table.Cell colspan={2}>저축금액(to 경조사통장)</Table.Cell>
+				<Table.Cell colspan={2}>원</Table.Cell>
+			</Table.Row>
+		</Table.Footer>
 	</Table.Root>
 </div>
