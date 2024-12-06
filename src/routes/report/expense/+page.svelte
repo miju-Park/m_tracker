@@ -6,6 +6,7 @@
 	import { transactionStore } from '../../../store/transaction';
 	import UsageCell from './UsageCell.svelte';
 	import * as Table from '$lib/components/ui/table';
+	import PieChart from '../../../components/PieChart.svelte';
 
 	let year: number;
 	let month: number;
@@ -15,6 +16,9 @@
 		month = cur?.month;
 	});
 
+	/**
+	 * 카테고리 항목별 예산, 실제 소비금액 계산
+	 */
 	const expenseSummaries = derived(
 		[transactionStore, dateFilter, expenseCategories],
 		([$transactionStore, $dateFilter, $expenseCategories]) => {
@@ -50,11 +54,41 @@
 		}
 	);
 
-	const familyEventEvent = (data:typeof expenseSummaries[0])=>{
-		return data.category.includes('부모님') || data.category==='[교통] 기차' || data.category==='[경조사] 경조사' ;
-	}
-	const comsumptionCategory = (data: typeof expenseSummaries[0])=>{
-		switch(data.category) {
+	/**
+	 * 실제 소비금액을 대분류 카테고리 기준으로 Grouping >> pie chart 표시용
+	 */
+	const groupedByCategory = derived([expenseSummaries], ([summary]) => {
+		const result = summary.reduce(
+			(acc, cur) => {
+				const category = cur.category.split(']')[0].slice(1);
+				return {
+					...acc,
+					[category]: {
+						color: cur.color,
+						amount: (acc?.[category]?.amount ?? 0) + cur.amount
+					}
+				};
+			},
+			{} as Record<string, { amount: number; color?: string }>
+		);
+		return Object.keys(result)
+			.map((k) => ({
+				label: k,
+				value: result[k].amount,
+				color: result[k].color ?? 'black'
+			}))
+			.filter((v) => v.value > 0);
+	});
+
+	const familyEventEvent = (data: (typeof expenseSummaries)[0]) => {
+		return (
+			data.category.includes('부모님') ||
+			data.category === '[교통] 기차' ||
+			data.category === '[경조사] 경조사'
+		);
+	};
+	const comsumptionCategory = (data: (typeof expenseSummaries)[0]) => {
+		switch (data.category) {
 			case '[건강] 건강식품':
 			case '[건강] 약국':
 			case '[건강] 병원':
@@ -79,30 +113,33 @@
 			default:
 				return false;
 		}
-	}
+	};
 
-	const extraSummary = derived([expenseSummaries],([summary])=>{
-		return summary.reduce((iter,cur)=>{
-			//경조사비
-			if(familyEventEvent(cur)){
-				return {
-					...iter,
-					familyEvent: iter.familyEvent+(cur.budget-cur.amount)
+	const extraSummary = derived([expenseSummaries], ([summary]) => {
+		return summary.reduce(
+			(iter, cur) => {
+				//경조사비
+				if (familyEventEvent(cur)) {
+					return {
+						...iter,
+						familyEvent: iter.familyEvent + (cur.budget - cur.amount)
+					};
+				} else if (comsumptionCategory(cur)) {
+					return {
+						...iter,
+						consumption: iter.consumption + (cur.budget - cur.amount)
+					};
+				} else {
+					return iter;
 				}
-			} else if(comsumptionCategory(cur)) {
-				return {
-					...iter,
-					consumption: iter.consumption+(cur.budget-cur.amount)
-				}
-			} else {
-				return iter;
+			},
+			{
+				familyEvent: 0,
+				consumption: 0
 			}
-		},{
-			familyEvent:0,
-			consumption:0
-		})
-	})
-	
+		);
+	});
+
 	onMount(() => {
 		return () => {
 			unsubDate();
@@ -110,7 +147,7 @@
 	});
 </script>
 
-<div class="px-10 py-4 flex flex-col">
+<div class="px-10 py-4 gap-2 grid grid-cols-1 items-start sm:grid-cols-[7fr_3fr]">
 	<Table.Root>
 		<Table.Caption>Track your monthly expenses and budget</Table.Caption>
 		<Table.Header>
@@ -144,4 +181,6 @@
 			</Table.Row>
 		</Table.Footer>
 	</Table.Root>
+	<!-- Pie charts -->
+	<PieChart data={$groupedByCategory} />
 </div>
