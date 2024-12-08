@@ -171,7 +171,7 @@
 		<ResponsiveModal
 			triggerTargetValue={amount ? `${amount.toLocaleString()}` : ''}
 			title="금액 입력"
-			triggerClassName="min-w-[200px] bg-transparent border-none justify-start p-0"
+			triggerClassName="min-w-[200px] bg-transparent hover:bg-primary/90 border-none justify-start p-0"
 			open={popover.calculatorOpen}
 		>
 			<Calculator on:submit={handleAmountSubmit} initialValue={amount} />

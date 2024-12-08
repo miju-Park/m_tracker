@@ -21,9 +21,9 @@
 				>{triggerTargetValue}</Button
 			>
 		</Dialog.Trigger>
-		<Dialog.Content class="sm:max-w-[425px]">
+		<Dialog.Content class="sm:max-w-[425px] bg-[#1a1a2e]">
 			<Dialog.Header>
-				<Dialog.Title>{title}</Dialog.Title>
+				<Dialog.Title class="text-white">{title}</Dialog.Title>
 				<Dialog.Description>
 					{description}
 				</Dialog.Description>
@@ -38,9 +38,9 @@
 				>{triggerTargetValue}</Button
 			>
 		</Drawer.Trigger>
-		<Drawer.Content>
+		<Drawer.Content class="bg-[#1a1a2e]">
 			<Drawer.Header class="text-left">
-				<Drawer.Title>{title}</Drawer.Title>
+				<Drawer.Title class="text-white">{title}</Drawer.Title>
 				<Drawer.Description>
 					{description}
 				</Drawer.Description>

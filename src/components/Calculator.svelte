@@ -79,6 +79,7 @@
 		{/each}
 	</div>
 	<button
+	class="w-full mt-[5px]"
 		on:click|stopPropagation={() => {
 			dispatch('submit', { amount: Number($result) });
 		}}>OK</button
@@ -90,7 +91,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		width: 280px;
+		width: 100%;
 		margin: 20px auto;
 		background-color: #1a1a2e; /* Dark background */
 		border-radius: 8px;
@@ -107,6 +108,8 @@
 	}
 
 	.buttons {
+		margin-top: 5px;
+		width:100%;
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
 		gap: 5px;
