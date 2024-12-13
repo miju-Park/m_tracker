@@ -84,16 +84,16 @@ export const summariedTransactions = derived(
 			.reduce(
 				(iter, cur) => {
 					if (cur.type === 'income') {
-						return { ...iter, income: iter.income + cur.amount };
+						return { ...iter, income: iter.income + Number(cur.amount) };
 					} else if (cur.type === 'expense') {
 						return {
 							...iter,
-							expense: iter.expense + cur.amount
+							expense: iter.expense + Number(cur.amount)
 						};
 					} else if (cur.type === 'withdraw') {
 						return {
 							...iter,
-							withdraw: iter.withdraw + cur.amount
+							withdraw: iter.withdraw + Number(cur.amount)
 						};
 					}
 					return iter;

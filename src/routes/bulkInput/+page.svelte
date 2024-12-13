@@ -36,38 +36,15 @@
 	};
 	const processImport = async () => {
 		for await (const item of itemData) {
-			const [description, date, type, amount, category] = item as [
-				string,
-				string,
-				string,
-				number,
-				string
-			];
-			if (type !== 'income') {
-				const categoryInfo = configList.find((v) => v.subCategory === category);
-				if (!categoryInfo) {
-					console.log('--- insert err---');
-					console.log(item);
-					console.log('-----');
-					return;
-				}
-				const _category = `[${categoryInfo.category}] ${category}`;
-				await insertDb({
-					description,
-					date,
-					type,
-					amount,
-					category: _category
-				});
-			} else {
-				await insertDb({
-					description,
-					date,
-					type,
-					amount,
-					category
-				});
-			}
+			const { description, date, type, amount, category } = item;
+
+			await insertDb({
+				description,
+				date,
+				type,
+				amount,
+				category
+			});
 		}
 	};
 	onMount(() => {

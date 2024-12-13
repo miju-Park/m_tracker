@@ -7,10 +7,11 @@
 		if ($summariedTransactions.income === 0) {
 			return 0;
 		}
-		return (
+		return Math.max(
+			0,
 			(($summariedTransactions.income - $summariedTransactions.expense) /
 				$summariedTransactions.income) *
-			100
+				100
 		);
 	});
 	const progressColor = derived(savingPortion, ($savingPortion) => {
