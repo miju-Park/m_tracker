@@ -19,6 +19,17 @@
 	import Summary from '@/components/Summary.svelte';
 	import { dateStore } from '../../store/date';
 	import { configStore } from '../../store/configStore';
+	import {
+		AlertDialog,
+		AlertDialogAction,
+		AlertDialogCancel,
+		AlertDialogDescription,
+		AlertDialogFooter,
+		AlertDialogHeader,
+		AlertDialogTitle,
+		AlertDialogTrigger,
+		AlertDialogContent
+	} from '@/components/ui/alert-dialog';
 
 	let user: User | null;
 	let year: number;
@@ -162,10 +173,23 @@
 										>{Number(transaction.amount)?.toLocaleString()}원</TableBodyCell
 									>
 
-									<button
-										class="delete-button group-hover:block"
-										on:click={() => deleteTransaction(transaction.id)}>삭제</button
-									>
+									<AlertDialog>
+										<AlertDialogTrigger>
+											<button class="delete-button group-hover:block">삭제</button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
+												<AlertDialogDescription>선택한 항목이 삭제됩니다.</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>취소</AlertDialogCancel>
+												<AlertDialogAction on:click={() => deleteTransaction(transaction.id)}
+													>확인</AlertDialogAction
+												>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
 								</TableBodyRow>
 							{/each}
 						</TableBody>
