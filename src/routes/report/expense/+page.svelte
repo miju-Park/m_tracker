@@ -80,14 +80,14 @@
 			.filter((v) => v.value > 0);
 	});
 
-	const familyEventEvent = (data: (typeof expenseSummaries)[0]) => {
+	const familyEventEvent = (data: (typeof $expenseSummaries)[number]) => {
 		return (
 			data.category.includes('부모님') ||
 			data.category === '[교통] 기차' ||
 			data.category === '[경조사] 경조사'
 		);
 	};
-	const comsumptionCategory = (data: (typeof expenseSummaries)[0]) => {
+	const comsumptionCategory = (data: (typeof $expenseSummaries)[number]) => {
 		switch (data.category) {
 			case '[건강] 건강식품':
 			case '[건강] 약국':
@@ -162,8 +162,8 @@
 			{#each $expenseSummaries as summary}
 				<Table.Row>
 					<Table.Cell>{summary.icon} {summary.category}</Table.Cell>
-					<Table.Cell>{summary.amount}</Table.Cell>
-					<Table.Cell>{summary.budget}</Table.Cell>
+					<Table.Cell>{summary.amount.toLocaleString()}</Table.Cell>
+					<Table.Cell>{summary.budget.toLocaleString()}</Table.Cell>
 					<Table.Cell class="text-right">
 						<UsageCell budget={summary.budget} amount={summary.amount} />
 					</Table.Cell>
