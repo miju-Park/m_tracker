@@ -46,7 +46,7 @@
 						a.category === cur.category
 							? {
 									...a,
-									amount: cur.amount + a.amount
+									amount: Number(cur.amount) + Number(a.amount)
 								}
 							: a
 					);

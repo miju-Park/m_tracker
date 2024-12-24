@@ -51,6 +51,7 @@
 		"svelte-legos": "^0.2.5",
 		"svelte-radix": "^1.1.1",
 		"tailwind-merge": "^2.5.2",
-		"tailwind-variants": "^0.2.1"
+		"tailwind-variants": "^0.2.1",
+		"xlsx": "^0.18.5"
 	}
 }

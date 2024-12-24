@@ -19,10 +19,12 @@ export const dateFilter = derived(dateStore, ($dateStore) => {
 			new Date(
 				`${
 					$dateStore.month === 1 ? $dateStore.year - 1 : $dateStore.year
-				}-${$dateStore.month === 1 ? 12 : $dateStore.month - 1}-25`
+				}-${$dateStore.month === 1 ? 12 : $dateStore.month - 1}-25T00:00:00+09:00`
 			)
 		),
-		endTime: Timestamp.fromDate(new Date($dateStore.year, $dateStore.month - 1, 24))
+		endTime: Timestamp.fromDate(
+			new Date(`${$dateStore.year}-${$dateStore.month}-24T23:59:59+09:00`)
+		)
 	};
 });
 
@@ -32,9 +34,11 @@ export const prevDateFilter = derived(previousMonth, ($previousMonth) => {
 			new Date(
 				`${
 					$previousMonth.month === 1 ? $previousMonth.year - 1 : $previousMonth.year
-				}-${$previousMonth.month === 1 ? 12 : $previousMonth.month - 1}-25`
+				}-${$previousMonth.month === 1 ? 12 : $previousMonth.month - 1}-25T00:00:00+09:00`
 			)
 		),
-		endTime: Timestamp.fromDate(new Date($previousMonth.year, $previousMonth.month - 1, 24))
+		endTime: Timestamp.fromDate(
+			new Date(`${$previousMonth.year}-${$previousMonth.month}-24T23:59:59+09:00`)
+		)
 	};
 });

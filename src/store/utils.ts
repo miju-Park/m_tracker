@@ -13,9 +13,9 @@ export function createUniqueStore<T extends { id: string; date?: Timestamp }>(
 		update,
 		addUnique: (newItems: Array<T>) => {
 			update((items) => {
-				const uniqueNewItems = newItems.filter(
-					(newItem) => !items.some((existingItem) => existingItem.id === newItem.id)
-				);
+				const existingIds = new Set(items.map((item) => item.id));
+				const uniqueNewItems = newItems.filter((newItem) => !existingIds.has(newItem.id));
+
 				return [...items, ...uniqueNewItems].sort(
 					(a, b) => (b?.date?.seconds ?? 0) - (a?.date?.seconds ?? 0)
 				);

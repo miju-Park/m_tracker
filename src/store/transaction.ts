@@ -46,6 +46,31 @@ export const transactionHandlers = {
 				}) as TransactionType
 		);
 	},
+	getAllByRange: async (userId: string, start_date: Date, end_date: Date) => {
+		const transactionsRef = collection(db, 'transactions');
+		const startDate = Timestamp.fromDate(start_date);
+		const endDate = Timestamp.fromDate(end_date);
+		console.log('startDate', start_date);
+		console.log('endDate', end_date);
+
+		const q = query(
+			transactionsRef,
+			where('userId', '==', userId),
+			where('date', '>=', startDate),
+			where('date', '<=', endDate),
+			orderBy('date', 'desc')
+		);
+
+		const querySnapshot = await getDocs(q);
+
+		return querySnapshot.docs.map(
+			(doc: QueryDocumentSnapshot<DocumentData>) =>
+				({
+					id: doc.id,
+					...doc.data()
+				}) as TransactionType
+		);
+	},
 	add: async (transaction: Omit<TransactionType, 'id'>) => {
 		const docRef = doc(collection(db, 'transactions'));
 		await setDoc(docRef, transaction);
